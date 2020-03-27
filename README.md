@@ -9,7 +9,7 @@ This is a repository containing project files of the QSOC (_Quantum Space Operat
 
 **If you are participating as a student, do NOT look further as this repository may contain solutions to the problem sheets.**
 
-_Seriously, don't cheat!_
+_Seriously, don't cheat! :-)_
 
 ## Testing
 Unit tests are run by executing
