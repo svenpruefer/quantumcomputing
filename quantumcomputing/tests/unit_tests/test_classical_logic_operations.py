@@ -44,7 +44,7 @@ class TestClassicalLogicOperations:
 
         """
         # Given
-        qc.initialize([0, 0, 0, 1, 0, 0, 0, 0], qc.qregs) # Initial state |011>
+        qc.initialize([0, 0, 0, 0, 0, 0, 1, 0], qc.qregs)  # Initial state |110>
         qc.ccx(0, 1, 2)
         qc.measure(2, 0)
 
@@ -73,7 +73,7 @@ class TestClassicalLogicOperations:
 
         """
         # Given
-        qc.initialize([0, 0, 0, 0, 0, 0, 0, 1], qc.qregs) # Initial state |011>
+        qc.initialize([0, 0, 0, 0, 0, 0, 0, 1], qc.qregs)  # Initial state |111>
         qc.ccx(0, 1, 2)
         qc.measure(2, 0)
 
@@ -85,4 +85,121 @@ class TestClassicalLogicOperations:
 
         # Then
         expected_results: Dict[str, float] = {'0': 1}
+        assert result == approx(expected_results, rel=config['relative_error'])
+
+    def test_and_on_0_0(self, qc: QuantumCircuit, simulator: BaseBackend, config: Dict[str, Any]) -> None:
+        """
+        Test a NOT gate implemented via Toffoli gates::
+
+        |         ┌──────────────────────────────┐
+        |q0_0: |0>┤0                             ├──■─────
+        |         │                              │  │
+        |q0_1: |0>┤1 Initialize(0,0,0,0,0,0,0,0) ├──■─────
+        |         │                              │┌─┴─┐┌─┐
+        |q0_2: |0>┤2                             ├┤ X ├┤M├
+        |         └──────────────────────────────┘└───┘└╥┘
+        |c0_0: 0  ══════════════════════════════════════╩═
+
+        """
+        # Given
+        qc.initialize([1, 0, 0, 0, 0, 0, 0, 0], qc.qregs)  # Initial state |000>
+        qc.ccx(0, 1, 2)
+        qc.measure(2, 0)
+
+        # When
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job.result().get_counts(qc).items()}
+
+        # Then
+        expected_results: Dict[str, float] = {'0': 1}
+        assert result == approx(expected_results, rel=config['relative_error'])
+
+    def test_and_on_0_1(self, qc: QuantumCircuit, simulator: BaseBackend, config: Dict[str, Any]) -> None:
+        """
+        Test a NOT gate implemented via Toffoli gates::
+
+        |         ┌──────────────────────────────┐
+        |q3_0: |0>┤0                             ├──■─────
+        |         │                              │  │
+        |q3_1: |0>┤1 Initialize(0,1,0,0,0,0,0,0) ├──■─────
+        |         │                              │┌─┴─┐┌─┐
+        |q3_2: |0>┤2                             ├┤ X ├┤M├
+        |         └──────────────────────────────┘└───┘└╥┘
+        | c3_0: 0 ══════════════════════════════════════╩═
+
+        """
+        # Given
+        qc.initialize([0, 1, 0, 0, 0, 0, 0, 0], qc.qregs)  # Initial state |001>
+        qc.ccx(0, 1, 2)
+        qc.measure(2, 0)
+
+        # When
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job.result().get_counts(qc).items()}
+
+        # Then
+        expected_results: Dict[str, float] = {'0': 1}
+        assert result == approx(expected_results, rel=config['relative_error'])
+
+    def test_and_on_1_0(self, qc: QuantumCircuit, simulator: BaseBackend, config: Dict[str, Any]) -> None:
+        """
+        Test a NOT gate implemented via Toffoli gates::
+
+        |         ┌──────────────────────────────┐
+        |q4_0: |0>┤0                             ├──■─────
+        |         │                              │  │
+        |q4_1: |0>┤1 Initialize(0,0,1,0,0,0,0,0) ├──■─────
+        |         │                              │┌─┴─┐┌─┐
+        |q4_2: |0>┤2                             ├┤ X ├┤M├
+        |         └──────────────────────────────┘└───┘└╥┘
+        | c4_0: 0 ══════════════════════════════════════╩═
+
+        """
+        # Given
+        qc.initialize([0, 0, 1, 0, 0, 0, 0, 0], qc.qregs)  # Initial state |010>
+        qc.ccx(0, 1, 2)
+        qc.measure(2, 0)
+        # qc.measure_all()
+
+        # When
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job.result().get_counts(qc).items()}
+
+        # Then
+        expected_results: Dict[str, float] = {'0': 1}
+        assert result == approx(expected_results, rel=config['relative_error'])
+
+    def test_and_on_1_1(self, qc: QuantumCircuit, simulator: BaseBackend, config: Dict[str, Any]) -> None:
+        """
+        Test a NOT gate implemented via Toffoli gates::
+
+        |         ┌──────────────────────────────┐
+        |q0_0: |0>┤0                             ├──■─────
+        |         │                              │  │
+        |q0_1: |0>┤1 Initialize(0,0,0,1,0,0,0,0) ├──■─────
+        |         │                              │┌─┴─┐┌─┐
+        |q0_2: |0>┤2                             ├┤ X ├┤M├
+        |         └──────────────────────────────┘└───┘└╥┘
+        |c0_0: 0  ══════════════════════════════════════╩═
+
+        """
+        # Given
+        qc.initialize([0, 0, 0, 1, 0, 0, 0, 0], qc.qregs)  # Initial state |011>
+        qc.ccx(0, 1, 2)
+        qc.measure(2, 0)
+
+        # When
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job.result().get_counts(qc).items()}
+
+        # Then
+        expected_results: Dict[str, float] = {'1': 1}
         assert result == approx(expected_results, rel=config['relative_error'])
