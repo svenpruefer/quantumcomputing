@@ -4,16 +4,16 @@
 #
 # Copyright (c) 2020 by DLR.
 
+import math
 from typing import *
+
 import pytest
 from pytest import approx
 from qiskit import *
 from qiskit.providers import *
-from qiskit.result import Result
-import math
 
 
-class TestBasicQuantumStates:
+class TestSingleQubitGates:
 
     @pytest.fixture
     def qc(self) -> QuantumCircuit:
