@@ -9,6 +9,8 @@ import pytest
 from pytest import approx
 from qiskit import *
 from qiskit.providers import *
+from qiskit.result import Result
+import math
 
 
 class TestBasicQuantumStates:
@@ -22,16 +24,263 @@ class TestBasicQuantumStates:
     def simulator(self) -> BaseBackend:
         return Aer.get_backend("qasm_simulator")
 
-    def test_identity(self, qc: QuantumCircuit, simulator: BaseBackend) -> None:
+    @pytest.fixture
+    def config(self) -> Dict[str, Any]:
+        return {'test_runs': 100000,
+                'relative_error': 0.01}
+
+    def test_identity_on_0(self, qc: QuantumCircuit, simulator: BaseBackend, config: Dict[str, Any]) -> None:
+        """
+        Test the following quantum circuit::
+
+        |             ┌────┐ ░ ┌─┐
+        |    q0_0: |0>┤ Id ├─░─┤M├
+        |             └────┘ ░ └╥┘
+        |measure_0: 0 ══════════╩═
+
+        """
         # Given
         qc.iden(0)
         qc.measure_all()
-        expected_results: Dict[str, int] = {'0': 1000}
 
         # When
-        job: BaseJob = execute(qc, simulator, shots=1000)
-        job_result = job.result()
-        result: Dict[str, int] = job_result.get_counts(qc)
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        job_result: Result = job.result()
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job_result.get_counts(qc).items()}
 
         # Then
-        assert result == approx(expected_results, rel=5e-2)
+        expected_results: Dict[str, float] = {'0': 1}
+        assert result == approx(expected_results, rel=config['relative_error'])
+
+    def test_identity_on_superposition(self, qc: QuantumCircuit, simulator: BaseBackend,
+                                       config: Dict[str, Any]) -> None:
+        """
+        Test the following quantum circuit::
+
+        |             ┌─────────────────────────────┐┌────┐ ░ ┌─┐
+        |    q0_0: |0>┤ Initialize(0.70711,0.70711) ├┤ Id ├─░─┤M├
+        |             └─────────────────────────────┘└────┘ ░ └╥┘
+        |measure_0: 0 ═════════════════════════════════════════╩═
+
+        """
+        # Given
+        qc.initialize([1 / math.sqrt(2), 1 / math.sqrt(2)], qc.qregs)
+        qc.iden(0)
+        qc.measure_all()
+
+        # When
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        job_result: Result = job.result()
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job_result.get_counts(qc).items()}
+
+        # Then
+        expected_results: Dict[str, float] = {'0': 0.5, '1': 0.5}
+        assert result == approx(expected_results, rel=config['relative_error'])
+
+    def test_x_on_0(self, qc: QuantumCircuit, simulator: BaseBackend, config: Dict[str, Any]) -> None:
+        """
+        Test the following quantum circuit::
+
+        |             ┌───┐ ░ ┌─┐
+        |    q0_0: |0>┤ X ├─░─┤M├
+        |             └───┘ ░ └╥┘
+        |measure_0: 0 ═════════╩═
+
+        """
+        # Given
+        qc.x(0)
+        qc.measure_all()
+
+        # When
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        job_result: Result = job.result()
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job_result.get_counts(qc).items()}
+
+        # Then
+        expected_results: Dict[str, float] = {'1': 1}
+        assert result == approx(expected_results, rel=config['relative_error'])
+
+    def test_x_on_superposition(self, qc: QuantumCircuit, simulator: BaseBackend, config: Dict[str, Any]) -> None:
+        """
+        Test the following quantum circuit::
+
+        |             ┌─────────────────────────────┐┌───┐ ░ ┌─┐
+        |    q0_0: |0>┤ Initialize(0.70711,0.70711) ├┤ X ├─░─┤M├
+        |             └─────────────────────────────┘└───┘ ░ └╥┘
+        |measure_0: 0 ════════════════════════════════════════╩═
+
+        """
+        # Given
+        qc.initialize([1 / math.sqrt(2), 1 / math.sqrt(2)], qc.qregs)
+        qc.x(0)
+        qc.measure_all()
+
+        # When
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        job_result: Result = job.result()
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job_result.get_counts(qc).items()}
+
+        # Then
+        expected_results: Dict[str, float] = {'0': 0.5, '1': 0.5}
+        assert result == approx(expected_results, rel=config['relative_error'])
+
+    def test_y_on_0(self, qc: QuantumCircuit, simulator: BaseBackend, config: Dict[str, Any]) -> None:
+        """
+        Test the following quantum circuit::
+
+        |             ┌───┐ ░ ┌─┐
+        |    q0_0: |0>┤ Y ├─░─┤M├
+        |             └───┘ ░ └╥┘
+        |measure_0: 0 ═════════╩═
+
+        """
+        # Given
+        qc.y(0)
+        qc.measure_all()
+
+        # When
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        job_result: Result = job.result()
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job_result.get_counts(qc).items()}
+
+        # Then
+        expected_results: Dict[str, float] = {'1': 1}
+        assert result == approx(expected_results, rel=config['relative_error'])
+
+    def test_y_on_superposition(self, qc: QuantumCircuit, simulator: BaseBackend, config: Dict[str, Any]) -> None:
+        """
+        Test the following quantum circuit::
+
+                     ┌─────────────────────────────┐┌───┐ ░ ┌─┐
+            q0_0: |0>┤ Initialize(0.70711,0.70711) ├┤ Y ├─░─┤M├
+                     └─────────────────────────────┘└───┘ ░ └╥┘
+        measure_0: 0 ════════════════════════════════════════╩═
+
+        """
+        # Given
+        qc.initialize([1 / math.sqrt(2), 1 / math.sqrt(2)], qc.qregs)
+        qc.x(0)
+        qc.measure_all()
+
+        # When
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        job_result: Result = job.result()
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job_result.get_counts(qc).items()}
+
+        # Then
+        expected_results: Dict[str, float] = {'0': 0.5, '1': 0.5}
+        assert result == approx(expected_results, rel=config['relative_error'])
+
+    def test_z_on_0(self, qc: QuantumCircuit, simulator: BaseBackend, config: Dict[str, Any]) -> None:
+        """
+        Test the following quantum circuit::
+
+        |             ┌───┐ ░ ┌─┐
+        |    q0_0: |0>┤ Z ├─░─┤M├
+        |             └───┘ ░ └╥┘
+        |measure_0: 0 ═════════╩═
+
+        """
+        # Given
+        qc.z(0)
+        qc.measure_all()
+
+        # When
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        job_result: Result = job.result()
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job_result.get_counts(qc).items()}
+
+        # Then
+        expected_results: Dict[str, float] = {'0': 1}
+        assert result == approx(expected_results, rel=config['relative_error'])
+
+    def test_z_on_superposition(self, qc: QuantumCircuit, simulator: BaseBackend, config: Dict[str, Any]) -> None:
+        """
+        Test the following quantum circuit::
+
+                     ┌─────────────────────────────┐┌───┐ ░ ┌─┐
+            q0_0: |0>┤ Initialize(0.70711,0.70711) ├┤ Z ├─░─┤M├
+                     └─────────────────────────────┘└───┘ ░ └╥┘
+        measure_0: 0 ════════════════════════════════════════╩═
+
+        """
+        # Given
+        qc.initialize([1 / math.sqrt(2), 1 / math.sqrt(2)], qc.qregs)
+        qc.z(0)
+        qc.measure_all()
+
+        # When
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        job_result: Result = job.result()
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job_result.get_counts(qc).items()}
+
+        # Then
+        expected_results: Dict[str, float] = {'0': 0.5, '1': 0.5}
+        assert result == approx(expected_results, rel=config['relative_error'])
+
+    def test_h_on_0(self, qc: QuantumCircuit, simulator: BaseBackend, config: Dict[str, Any]) -> None:
+        """
+        Test the following quantum circuit::
+
+        |             ┌───┐ ░ ┌─┐
+        |    q0_0: |0>┤ H ├─░─┤M├
+        |             └───┘ ░ └╥┘
+        |measure_0: 0 ═════════╩═
+
+        """
+        # Given
+        qc.h(0)
+        qc.measure_all()
+
+        # When
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        job_result: Result = job.result()
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job_result.get_counts(qc).items()}
+
+        # Then
+        expected_results: Dict[str, float] = {'0': 0.5, '1': 0.5}
+        assert result == approx(expected_results, rel=config['relative_error'])
+
+    def test_h_on_superposition(self, qc: QuantumCircuit, simulator: BaseBackend, config: Dict[str, Any]) -> None:
+        """
+        Test the following quantum circuit::
+
+        |             ┌─────────────────────────────┐┌───┐ ░ ┌─┐
+        |    q0_0: |0>┤ Initialize(0.70711,0.70711) ├┤ H ├─░─┤M├
+        |             └─────────────────────────────┘└───┘ ░ └╥┘
+        |measure_0: 0 ════════════════════════════════════════╩═
+
+        """
+        # Given
+        qc.initialize([1 / math.sqrt(2), 1 / math.sqrt(2)], qc.qregs)
+        qc.h(0)
+        qc.measure_all()
+
+        # When
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        job_result: Result = job.result()
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job_result.get_counts(qc).items()}
+
+        # Then
+        expected_results: Dict[str, float] = {'0': 1}
+        assert result == approx(expected_results, rel=config['relative_error'])
