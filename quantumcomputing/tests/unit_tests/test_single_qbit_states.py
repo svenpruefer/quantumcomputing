@@ -45,10 +45,9 @@ class TestBasicQuantumStates:
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        job_result: Result = job.result()
         # Calculate relative results
         result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job_result.get_counts(qc).items()}
+                                    job.result().get_counts(qc).items()}
 
         # Then
         expected_results: Dict[str, float] = {'0': 1}
@@ -72,10 +71,9 @@ class TestBasicQuantumStates:
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        job_result: Result = job.result()
         # Calculate relative results
         result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job_result.get_counts(qc).items()}
+                                    job.result().get_counts(qc).items()}
 
         # Then
         expected_results: Dict[str, float] = {'0': 0.5, '1': 0.5}
@@ -97,10 +95,9 @@ class TestBasicQuantumStates:
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        job_result: Result = job.result()
         # Calculate relative results
         result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job_result.get_counts(qc).items()}
+                                    job.result().get_counts(qc).items()}
 
         # Then
         expected_results: Dict[str, float] = {'1': 1}
@@ -123,10 +120,9 @@ class TestBasicQuantumStates:
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        job_result: Result = job.result()
         # Calculate relative results
         result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job_result.get_counts(qc).items()}
+                                    job.result().get_counts(qc).items()}
 
         # Then
         expected_results: Dict[str, float] = {'0': 0.5, '1': 0.5}
@@ -148,10 +144,9 @@ class TestBasicQuantumStates:
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        job_result: Result = job.result()
         # Calculate relative results
         result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job_result.get_counts(qc).items()}
+                                    job.result().get_counts(qc).items()}
 
         # Then
         expected_results: Dict[str, float] = {'1': 1}
@@ -174,10 +169,9 @@ class TestBasicQuantumStates:
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        job_result: Result = job.result()
         # Calculate relative results
         result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job_result.get_counts(qc).items()}
+                                    job.result().get_counts(qc).items()}
 
         # Then
         expected_results: Dict[str, float] = {'0': 0.5, '1': 0.5}
@@ -199,10 +193,9 @@ class TestBasicQuantumStates:
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        job_result: Result = job.result()
         # Calculate relative results
         result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job_result.get_counts(qc).items()}
+                                    job.result().get_counts(qc).items()}
 
         # Then
         expected_results: Dict[str, float] = {'0': 1}
@@ -225,10 +218,9 @@ class TestBasicQuantumStates:
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        job_result: Result = job.result()
         # Calculate relative results
         result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job_result.get_counts(qc).items()}
+                                    job.result().get_counts(qc).items()}
 
         # Then
         expected_results: Dict[str, float] = {'0': 0.5, '1': 0.5}
@@ -250,10 +242,9 @@ class TestBasicQuantumStates:
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        job_result: Result = job.result()
         # Calculate relative results
         result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job_result.get_counts(qc).items()}
+                                    job.result().get_counts(qc).items()}
 
         # Then
         expected_results: Dict[str, float] = {'0': 0.5, '1': 0.5}
@@ -276,10 +267,9 @@ class TestBasicQuantumStates:
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        job_result: Result = job.result()
         # Calculate relative results
         result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job_result.get_counts(qc).items()}
+                                    job.result().get_counts(qc).items()}
 
         # Then
         expected_results: Dict[str, float] = {'0': 1}
