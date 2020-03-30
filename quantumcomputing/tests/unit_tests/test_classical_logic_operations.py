@@ -222,11 +222,12 @@ class TestClassicalLogicOperations:
         Variables are q0_0 and q0_2.
         """
         # Given
-        qreg = QuantumRegister(2, 'qreg')
+        qreg = QuantumRegister(3, 'qreg')
         creg = ClassicalRegister(1, 'creg')
         qc = QuantumCircuit(qreg, creg, name="test-circuit")
-        add_xor(qc, qreg[0], qreg[1])
-        qc.measure(qreg[1], creg[0])
+        qc.x(qreg[0])
+        add_xor(qc, qreg[0], qreg[1], qreg[2])
+        qc.measure(qreg[2], creg[0])
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
@@ -251,12 +252,13 @@ class TestClassicalLogicOperations:
         Variables are q0_0 and q0_2.
         """
         # Given
-        qreg = QuantumRegister(2, 'qreg')
+        qreg = QuantumRegister(3, 'qreg')
         creg = ClassicalRegister(1, 'creg')
         qc = QuantumCircuit(qreg, creg, name="test-circuit")
-        qc.x(qreg[1])
-        add_xor(qc, qreg[0], qreg[1])
-        qc.measure(qreg[1], creg[0])
+        qc.x(qreg[2])
+        qc.x(qreg[0])
+        add_xor(qc, qreg[0], qreg[1], qreg[2])
+        qc.measure(qreg[2], creg[0])
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
@@ -281,12 +283,13 @@ class TestClassicalLogicOperations:
         Variables are q0_0 and q0_2.
         """
         # Given
-        qreg = QuantumRegister(2, 'qreg')
+        qreg = QuantumRegister(3, 'qreg')
         creg = ClassicalRegister(1, 'creg')
         qc = QuantumCircuit(qreg, creg, name="test-circuit")
         qc.x(qreg[0])
-        add_xor(qc, qreg[0], qreg[1])
-        qc.measure(qreg[1], creg[0])
+        qc.x(qreg[1])
+        add_xor(qc, qreg[0], qreg[1], qreg[2])
+        qc.measure(qreg[2], creg[0])
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
@@ -311,13 +314,14 @@ class TestClassicalLogicOperations:
         Variables are q0_0 and q0_2.
         """
         # Given
-        qreg = QuantumRegister(2, 'qreg')
+        qreg = QuantumRegister(3, 'qreg')
         creg = ClassicalRegister(1, 'creg')
         qc = QuantumCircuit(qreg, creg, name="test-circuit")
         qc.x(qreg[0])
         qc.x(qreg[1])
-        add_xor(qc, qreg[0], qreg[1])
-        qc.measure(qreg[1], creg[0])
+        qc.x(qreg[2])
+        add_xor(qc, qreg[0], qreg[1], qreg[2])
+        qc.measure(qreg[2], creg[0])
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
