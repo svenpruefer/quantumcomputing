@@ -14,6 +14,6 @@ _Seriously, don't cheat! :-)_
 ## Testing
 Unit tests are run by executing
 ```shell
-$ pytest quantumcomputing/tets/
+$ pytest quantumcomputing/tests/
 ```
 
