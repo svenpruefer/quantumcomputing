@@ -21,8 +21,8 @@ class TestClassicalLogicOperations:
 
     @pytest.fixture
     def config(self) -> Dict[str, Any]:
-        return {'test_runs': 100000,
-                'relative_error': 0.01}
+        return {'test_runs': 10000,
+                'relative_error': 0.05}
 
     def test_not_on_0(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
         """
