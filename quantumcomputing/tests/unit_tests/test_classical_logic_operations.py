@@ -81,16 +81,6 @@ class TestClassicalLogicOperations:
         expected_results: Dict[str, float] = {'0': 1}
         assert result == approx(expected_results, rel=config['relative_error'])
 
-        # When
-        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        # Calculate relative results
-        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job.result().get_counts(qc).items()}
-
-        # Then
-        expected_results: Dict[str, float] = {'0': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
-
     def test_and_on_0_0(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
         """
         Test a AND gate implemented via a Toffoli gate::
