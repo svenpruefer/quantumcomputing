@@ -225,7 +225,6 @@ class TestClassicalLogicOperations:
         qreg = QuantumRegister(3, 'qreg')
         creg = ClassicalRegister(1, 'creg')
         qc = QuantumCircuit(qreg, creg, name="test-circuit")
-        qc.x(qreg[0])
         add_xor(qc, qreg[0], qreg[1], qreg[2])
         qc.measure(qreg[2], creg[0])
 
@@ -255,8 +254,7 @@ class TestClassicalLogicOperations:
         qreg = QuantumRegister(3, 'qreg')
         creg = ClassicalRegister(1, 'creg')
         qc = QuantumCircuit(qreg, creg, name="test-circuit")
-        qc.x(qreg[2])
-        qc.x(qreg[0])
+        qc.x(qreg[1])
         add_xor(qc, qreg[0], qreg[1], qreg[2])
         qc.measure(qreg[2], creg[0])
 
@@ -286,7 +284,6 @@ class TestClassicalLogicOperations:
         qreg = QuantumRegister(3, 'qreg')
         creg = ClassicalRegister(1, 'creg')
         qc = QuantumCircuit(qreg, creg, name="test-circuit")
-        qc.x(qreg[0])
         qc.x(qreg[1])
         add_xor(qc, qreg[0], qreg[1], qreg[2])
         qc.measure(qreg[2], creg[0])
@@ -319,7 +316,6 @@ class TestClassicalLogicOperations:
         qc = QuantumCircuit(qreg, creg, name="test-circuit")
         qc.x(qreg[0])
         qc.x(qreg[1])
-        qc.x(qreg[2])
         add_xor(qc, qreg[0], qreg[1], qreg[2])
         qc.measure(qreg[2], creg[0])
 
