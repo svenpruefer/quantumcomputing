@@ -25,16 +25,15 @@ class TestFullAdder:
                 'relative_error': 0.05}
 
     def test_full_adder_on_0_0_0(self, simulator, config) -> None:
-        one_reg = QuantumRegister(1, 'one')
         input_reg = QuantumRegister(3, 'input')
         carry_reg = QuantumRegister(2, 'carry')
+        sum_reg = QuantumRegister(2, 'sum')
         measure = ClassicalRegister(2, 'measure')
-        qc = QuantumCircuit(one_reg, input_reg, carry_reg, measure, name="half-adder-circuit")
-        qc.x(one_reg[0])
+        qc = QuantumCircuit(input_reg, carry_reg, sum_reg, measure, name="half-adder-circuit")
         # Prepare Input
-        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], one_reg[0], carry_reg[1], carry_reg[0])
-        qc.measure(input_reg[2], measure[1])
-        qc.measure(carry_reg[0], measure[0])
+        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
+        qc.measure(sum_reg[1], measure[1])
+        qc.measure(carry_reg[1], measure[0])
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
@@ -48,17 +47,16 @@ class TestFullAdder:
         assert result == approx(expected_results, rel=config['relative_error'])
 
     def test_full_adder_on_0_0_1(self, simulator, config) -> None:
-        one_reg = QuantumRegister(1, 'one')
         input_reg = QuantumRegister(3, 'input')
         carry_reg = QuantumRegister(2, 'carry')
+        sum_reg = QuantumRegister(2, 'sum')
         measure = ClassicalRegister(2, 'measure')
-        qc = QuantumCircuit(one_reg, input_reg, carry_reg, measure, name="half-adder-circuit")
-        qc.x(one_reg[0])
+        qc = QuantumCircuit(input_reg, carry_reg, sum_reg, measure, name="half-adder-circuit")
         # Prepare Input
         qc.x(input_reg[2])
-        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], one_reg[0], carry_reg[1], carry_reg[0])
-        qc.measure(input_reg[2], measure[1])
-        qc.measure(carry_reg[0], measure[0])
+        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
+        qc.measure(sum_reg[1], measure[1])
+        qc.measure(carry_reg[1], measure[0])
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
@@ -72,17 +70,16 @@ class TestFullAdder:
         assert result == approx(expected_results, rel=config['relative_error'])
 
     def test_full_adder_on_0_1_0(self, simulator, config) -> None:
-        one_reg = QuantumRegister(1, 'one')
         input_reg = QuantumRegister(3, 'input')
         carry_reg = QuantumRegister(2, 'carry')
+        sum_reg = QuantumRegister(2, 'sum')
         measure = ClassicalRegister(2, 'measure')
-        qc = QuantumCircuit(one_reg, input_reg, carry_reg, measure, name="half-adder-circuit")
-        qc.x(one_reg[0])
+        qc = QuantumCircuit(input_reg, carry_reg, sum_reg, measure, name="half-adder-circuit")
         # Prepare Input
         qc.x(input_reg[1])
-        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], one_reg[0], carry_reg[1], carry_reg[0])
-        qc.measure(input_reg[2], measure[1])
-        qc.measure(carry_reg[0], measure[0])
+        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
+        qc.measure(sum_reg[1], measure[1])
+        qc.measure(carry_reg[1], measure[0])
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
@@ -96,17 +93,16 @@ class TestFullAdder:
         assert result == approx(expected_results, rel=config['relative_error'])
 
     def test_full_adder_on_1_0_0(self, simulator, config) -> None:
-        one_reg = QuantumRegister(1, 'one')
         input_reg = QuantumRegister(3, 'input')
         carry_reg = QuantumRegister(2, 'carry')
+        sum_reg = QuantumRegister(2, 'sum')
         measure = ClassicalRegister(2, 'measure')
-        qc = QuantumCircuit(one_reg, input_reg, carry_reg, measure, name="half-adder-circuit")
-        qc.x(one_reg[0])
+        qc = QuantumCircuit(input_reg, carry_reg, sum_reg, measure, name="half-adder-circuit")
         # Prepare Input
         qc.x(input_reg[0])
-        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], one_reg[0], carry_reg[1], carry_reg[0])
-        qc.measure(input_reg[2], measure[1])
-        qc.measure(carry_reg[0], measure[0])
+        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
+        qc.measure(sum_reg[1], measure[1])
+        qc.measure(carry_reg[1], measure[0])
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
@@ -120,18 +116,17 @@ class TestFullAdder:
         assert result == approx(expected_results, rel=config['relative_error'])
 
     def test_full_adder_on_1_1_0(self, simulator, config) -> None:
-        one_reg = QuantumRegister(1, 'one')
         input_reg = QuantumRegister(3, 'input')
         carry_reg = QuantumRegister(2, 'carry')
+        sum_reg = QuantumRegister(2, 'sum')
         measure = ClassicalRegister(2, 'measure')
-        qc = QuantumCircuit(one_reg, input_reg, carry_reg, measure, name="half-adder-circuit")
-        qc.x(one_reg[0])
+        qc = QuantumCircuit(input_reg, carry_reg, sum_reg, measure, name="half-adder-circuit")
         # Prepare Input
         qc.x(input_reg[0])
         qc.x(input_reg[1])
-        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], one_reg[0], carry_reg[1], carry_reg[0])
-        qc.measure(input_reg[2], measure[1])
-        qc.measure(carry_reg[0], measure[0])
+        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
+        qc.measure(sum_reg[1], measure[1])
+        qc.measure(carry_reg[1], measure[0])
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
@@ -165,18 +160,17 @@ class TestFullAdder:
         |                                               ║
         |measure_1: 0 ══════════════════════════════════╩═
         """
-        one_reg = QuantumRegister(1, 'one')
         input_reg = QuantumRegister(3, 'input')
         carry_reg = QuantumRegister(2, 'carry')
+        sum_reg = QuantumRegister(2, 'sum')
         measure = ClassicalRegister(2, 'measure')
-        qc = QuantumCircuit(one_reg, input_reg, carry_reg, measure, name="half-adder-circuit")
-        qc.x(one_reg[0])
+        qc = QuantumCircuit(input_reg, carry_reg, sum_reg, measure, name="half-adder-circuit")
         # Prepare Input
         qc.x(input_reg[0])
         qc.x(input_reg[2])
-        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], one_reg[0], carry_reg[1], carry_reg[0])
-        qc.measure(input_reg[2], measure[1])
-        qc.measure(carry_reg[0], measure[0])
+        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
+        qc.measure(sum_reg[1], measure[1])
+        qc.measure(carry_reg[1], measure[0])
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
@@ -185,24 +179,23 @@ class TestFullAdder:
                                     job.result().get_counts(qc).items()}
 
         # Then
-        expected_results: Dict[str, float] = {'10': 1}
+        expected_results: Dict[str, float] = {'01': 1}
         print(result)
         print(qc.draw(output="text"))
         assert result == approx(expected_results, rel=config['relative_error'])
 
     def test_full_adder_on_0_1_1(self, simulator, config) -> None:
-        one_reg = QuantumRegister(1, 'one')
         input_reg = QuantumRegister(3, 'input')
         carry_reg = QuantumRegister(2, 'carry')
+        sum_reg = QuantumRegister(2, 'sum')
         measure = ClassicalRegister(2, 'measure')
-        qc = QuantumCircuit(one_reg, input_reg, carry_reg, measure, name="half-adder-circuit")
-        qc.x(one_reg[0])
+        qc = QuantumCircuit(input_reg, carry_reg, sum_reg, measure, name="half-adder-circuit")
         # Prepare Input
         qc.x(input_reg[1])
         qc.x(input_reg[2])
-        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], one_reg[0], carry_reg[1], carry_reg[0])
-        qc.measure(input_reg[2], measure[1])
-        qc.measure(carry_reg[0], measure[0])
+        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
+        qc.measure(sum_reg[1], measure[1])
+        qc.measure(carry_reg[1], measure[0])
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
@@ -211,25 +204,24 @@ class TestFullAdder:
                                     job.result().get_counts(qc).items()}
 
         # Then
-        expected_results: Dict[str, float] = {'10': 1}
+        expected_results: Dict[str, float] = {'01': 1}
         print(result)
         print(qc.draw(output="text"))
         assert result == approx(expected_results, rel=config['relative_error'])
 
     def test_full_adder_on_1_1_1(self, simulator, config) -> None:
-        one_reg = QuantumRegister(1, 'one')
         input_reg = QuantumRegister(3, 'input')
         carry_reg = QuantumRegister(2, 'carry')
+        sum_reg = QuantumRegister(2, 'sum')
         measure = ClassicalRegister(2, 'measure')
-        qc = QuantumCircuit(one_reg, input_reg, carry_reg, measure, name="half-adder-circuit")
-        qc.x(one_reg[0])
+        qc = QuantumCircuit(input_reg, carry_reg, sum_reg, measure, name="half-adder-circuit")
         # Prepare Input
         qc.x(input_reg[0])
         qc.x(input_reg[1])
         qc.x(input_reg[2])
-        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], one_reg[0], carry_reg[1], carry_reg[0])
-        qc.measure(input_reg[2], measure[1])
-        qc.measure(carry_reg[0], measure[0])
+        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
+        qc.measure(sum_reg[1], measure[1])
+        qc.measure(carry_reg[1], measure[0])
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])

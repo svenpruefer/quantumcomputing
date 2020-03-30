@@ -8,11 +8,14 @@ from qiskit import QuantumCircuit
 from qiskit.circuit import Qubit
 from quantumcomputing.gates.classic import (add_xor, add_and)
 
-def add_half_adder(qc: QuantumCircuit, a: Qubit, b: Qubit, one: Qubit, carry: Qubit) -> None:
-    add_and(qc, a, b, carry)
-    add_xor(qc, one, a, b)
 
-def add_full_adder(qc: QuantumCircuit, a: Qubit, b: Qubit, c: Qubit, one: Qubit, aux: Qubit, carry: Qubit) -> None:
-    add_half_adder(qc, b, c, one, carry)
-    add_half_adder(qc, a, c, one, aux)
-    add_xor(qc, one, aux, carry)
+def add_half_adder(qc: QuantumCircuit, a: Qubit, b: Qubit, sum: Qubit, carry: Qubit) -> None:
+    add_and(qc, a, b, carry)
+    add_xor(qc, a, b, sum)
+
+
+def add_full_adder(qc: QuantumCircuit, a: Qubit, b: Qubit, c: Qubit, sum_1: Qubit, carry_1: Qubit, sum_2: Qubit,
+                   carry_2: Qubit) -> None:
+    add_half_adder(qc, b, c, sum_1, carry_1)
+    add_half_adder(qc, a, sum_1, sum_2, carry_2)
+    qc.cx(carry_1, carry_2)
