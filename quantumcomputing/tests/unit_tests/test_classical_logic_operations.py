@@ -284,7 +284,7 @@ class TestClassicalLogicOperations:
         qreg = QuantumRegister(3, 'qreg')
         creg = ClassicalRegister(1, 'creg')
         qc = QuantumCircuit(qreg, creg, name="test-circuit")
-        qc.x(qreg[1])
+        qc.x(qreg[0])
         add_xor(qc, qreg[0], qreg[1], qreg[2])
         qc.measure(qreg[2], creg[0])
 
@@ -341,7 +341,7 @@ class TestClassicalLogicOperations:
         |           └───┘└───┘└───┘ ║
         | creg_0: 0 ════════════════╩═
 
-        Variables are qreg_0 and qreg_1 and input qreg_2 is assuemd to be |0>.
+        Variables are qreg_0 and qreg_1 and input qreg_2 is assumed to be |0>.
         """
         # Given
         qreg = QuantumRegister(3, 'qreg')
@@ -372,7 +372,7 @@ class TestClassicalLogicOperations:
         |           └───┘└───┘└───┘ ║
         | creg_0: 0 ════════════════╩═
 
-        Variables are qreg_0 and qreg_1 and input qreg_2 is assuemd to be |0>.
+        Variables are qreg_0 and qreg_1 and input qreg_2 is assumed to be |1>.
         """
         # Given
         qreg = QuantumRegister(3, 'qreg')
@@ -404,7 +404,7 @@ class TestClassicalLogicOperations:
         |           └───┘└───┘└───┘ ║
         | creg_0: 0 ════════════════╩═
 
-        Variables are qreg_0 and qreg_1 and input qreg_2 is assumed to be |0>.
+        Variables are qreg_0 and qreg_1 and input qreg_2 is assumed to be |1>.
         """
         # Given
         qreg = QuantumRegister(3, 'qreg')
@@ -436,7 +436,7 @@ class TestClassicalLogicOperations:
         |           └───┘└───┘└───┘ ║
         | creg_0: 0 ════════════════╩═
 
-        Variables are qreg_0 and qreg_1 and input qreg_2 is assuemd to be |0>.
+        Variables are qreg_0 and qreg_1 and input qreg_2 is assumed to be |1>.
         """
         # Given
         qreg = QuantumRegister(3, 'qreg')
