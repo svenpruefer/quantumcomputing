@@ -43,7 +43,6 @@ class TestFullAdder:
 
         # Then
         expected_results: Dict[str, float] = {'00': 1}
-        print(result)
         assert result == approx(expected_results, rel=config['relative_error'])
 
     def test_full_adder_on_0_0_1(self, simulator, config) -> None:
@@ -66,7 +65,6 @@ class TestFullAdder:
 
         # Then
         expected_results: Dict[str, float] = {'10': 1}
-        print(result)
         assert result == approx(expected_results, rel=config['relative_error'])
 
     def test_full_adder_on_0_1_0(self, simulator, config) -> None:
@@ -89,7 +87,6 @@ class TestFullAdder:
 
         # Then
         expected_results: Dict[str, float] = {'10': 1}
-        print(result)
         assert result == approx(expected_results, rel=config['relative_error'])
 
     def test_full_adder_on_1_0_0(self, simulator, config) -> None:
@@ -112,7 +109,6 @@ class TestFullAdder:
 
         # Then
         expected_results: Dict[str, float] = {'10': 1}
-        print(result)
         assert result == approx(expected_results, rel=config['relative_error'])
 
     def test_full_adder_on_1_1_0(self, simulator, config) -> None:
@@ -136,7 +132,6 @@ class TestFullAdder:
 
         # Then
         expected_results: Dict[str, float] = {'01': 1}
-        print(result)
         assert result == approx(expected_results, rel=config['relative_error'])
 
     def test_full_adder_on_1_0_1(self, simulator, config) -> None:
@@ -180,8 +175,6 @@ class TestFullAdder:
 
         # Then
         expected_results: Dict[str, float] = {'01': 1}
-        print(result)
-        print(qc.draw(output="text"))
         assert result == approx(expected_results, rel=config['relative_error'])
 
     def test_full_adder_on_0_1_1(self, simulator, config) -> None:
@@ -205,8 +198,6 @@ class TestFullAdder:
 
         # Then
         expected_results: Dict[str, float] = {'01': 1}
-        print(result)
-        print(qc.draw(output="text"))
         assert result == approx(expected_results, rel=config['relative_error'])
 
     def test_full_adder_on_1_1_1(self, simulator, config) -> None:
@@ -231,5 +222,4 @@ class TestFullAdder:
 
         # Then
         expected_results: Dict[str, float] = {'11': 1}
-        print(result)
         assert result == approx(expected_results, rel=config['relative_error'])
