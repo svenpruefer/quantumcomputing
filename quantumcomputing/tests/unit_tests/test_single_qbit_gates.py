@@ -26,8 +26,8 @@ class TestSingleQubitGates:
 
     @pytest.fixture
     def config(self) -> Dict[str, Any]:
-        return {'test_runs': 100000,
-                'relative_error': 0.01}
+        return {'test_runs': 1000,
+                'relative_error': 0.05}
 
     def test_identity_on_0(self, qc: QuantumCircuit, simulator: BaseBackend, config: Dict[str, Any]) -> None:
         """

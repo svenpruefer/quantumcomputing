@@ -24,11 +24,12 @@ def add_not(qc: QuantumCircuit, qubit: Qubit) -> None:
     return
 
 
-def add_xor(qc: QuantumCircuit, first: Qubit, second: Qubit) -> None:
+def add_xor(qc: QuantumCircuit, first: Qubit, second: Qubit, target: Qubit) -> None:
     """
-    Add a XOR gate acting on `first` and `second` and writing the result into `second`.
+    Add a XOR gate acting on `first` and `second` and writing the result into `target`.
     """
-    qc.cx(first, second)
+    qc.cx(first, target)
+    qc.cx(second, target)
 
 
 def add_or(qc: QuantumCircuit, first: Qubit, second: Qubit, target: Qubit) -> None:
