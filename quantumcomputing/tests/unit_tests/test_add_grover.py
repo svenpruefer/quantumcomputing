@@ -58,8 +58,6 @@ class TestGrover:
 
         # Then
         expected_results: Dict[str, float] = {'10': 1}
-        print(result)
-        print(qc.draw(output="text"))
         assert result == approx(expected_results, rel=config['relative_error'])
 
     def test_grover_with_ancilla_on_1_0(self, simulator, config):
