@@ -84,3 +84,13 @@ def add_full_adder_5(qc: QuantumCircuit, a: Qubit, b: Qubit, c: Qubit, sum: Qubi
     add_half_adder(qc, a, b, sum, carry)
     qc.ccx(c, sum, carry)
     qc.cx(c, sum)
+
+
+def add_full_adder_5_reverse(qc: QuantumCircuit, a: Qubit, b: Qubit, c: Qubit, sum: Qubit, carry: Qubit) -> None:
+    """
+    Add a reverse full adder to a QuantumCircuit, to be used e.g. in Grover when one needs to reset the sum and carry qubits.
+    """
+    qc.cx(c, sum)
+    qc.ccx(c, sum, carry)
+    # A half adder is the reverse of itsel because all operations commute
+    add_half_adder(qc, a, b, sum, carry)
