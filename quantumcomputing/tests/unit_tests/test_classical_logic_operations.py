@@ -22,25 +22,22 @@ class TestClassicalLogicOperations:
     @pytest.fixture
     def config(self) -> Dict[str, Any]:
         return {'test_runs': 10000,
-                'relative_error': 0.05}
+                'absolute_error': 0.02}
 
-    def test_not_on_0(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
-        """
-        Test a NOT gate implemented as an X gate::
-
-        |           ┌───┐┌─┐
-        |qreg_0: |0>┤ X ├┤M├
-        |           └───┘└╥┘
-        | creg_0: 0 ══════╩═
-
-        Variable is qreg_0.
-        """
+    def test_not(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
         # Given
-        qreg = QuantumRegister(1, 'qreg')
-        creg = ClassicalRegister(1, 'creg')
-        qc = QuantumCircuit(qreg, creg, name="test-circuit")
-        add_not(qc, qreg[0])
-        qc.measure(qreg[0], creg[0])
+        input = QuantumRegister(1, 'input')
+        input_measure = ClassicalRegister(1, 'input-measure')
+        output_measure = ClassicalRegister(1, 'output-measure')
+        qc = QuantumCircuit(input, input_measure, output_measure, name="test-circuit")
+
+        # Mix states to get randomized test cases and record them
+        qc.h(input)
+        qc.measure(input, input_measure)
+        # Add circuit to test
+        add_not(qc, input[0])
+        # Measure results
+        qc.measure(input, output_measure)
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
@@ -48,28 +45,26 @@ class TestClassicalLogicOperations:
         result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
                                     job.result().get_counts(qc).items()}
 
-        # Then
-        expected_results: Dict[str, float] = {'1': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
+        # Expected Results are strings 'output input'
+        expected_results: Dict[str, float] = {'0 1': 0.5,
+                                              '1 0': 0.5}
+        assert result == approx(expected_results, abs=config['absolute_error'])
 
-    def test_not_on_1(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
-        """
-        Test a NOT gate implemented as an X gate::
-
-        |           ┌───┐┌─┐
-        |qreg_0: |1>┤ X ├┤M├
-        |           └───┘└╥┘
-        | creg_0: 0 ══════╩═
-
-        Variable is qreg_0.
-        """
+    def test_and(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
         # Given
-        qreg = QuantumRegister(1, 'qreg')
-        creg = ClassicalRegister(1, 'creg')
-        qc = QuantumCircuit(qreg, creg, name="test-circuit")
-        qc.x(qreg[0])
-        add_not(qc, qreg[0])
-        qc.measure(qreg[0], creg[0])
+        input = QuantumRegister(2, 'input')
+        output = QuantumRegister(1, 'output')
+        input_measure = ClassicalRegister(2, 'input-measure')
+        output_measure = ClassicalRegister(1, 'output-measure')
+        qc = QuantumCircuit(input, output, input_measure, output_measure, name="test-circuit")
+
+        # Mix states to get randomized test cases and record them
+        qc.h(input)
+        qc.measure(input, input_measure)
+        # Add circuit to test
+        add_and(qc, input[0], input[1], output[0])
+        # Measure results
+        qc.measure(output, output_measure)
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
@@ -77,30 +72,28 @@ class TestClassicalLogicOperations:
         result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
                                     job.result().get_counts(qc).items()}
 
-        # Then
-        expected_results: Dict[str, float] = {'0': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
+        # Expected Results are strings 'output input'
+        expected_results: Dict[str, float] = {'0 00': 0.25,
+                                              '0 01': 0.25,
+                                              '0 10': 0.25,
+                                              '1 11': 0.25}
+        assert result == approx(expected_results, abs=config['absolute_error'])
 
-    def test_and_on_0_0(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
-        """
-        Test a AND gate implemented via a Toffoli gate::
-
-        |qreg_0: |0>──■─────
-        |             │
-        |qreg_1: |0>──■─────
-        |           ┌─┴─┐┌─┐
-        |qreg_2: |0>┤ X ├┤M├
-        |           └───┘└╥┘
-        | creg_0: 0 ══════╩═
-
-        Variables are qreg_0 and qreg_1.
-        """
+    def test_xor(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
         # Given
-        qreg = QuantumRegister(3, 'qreg')
-        creg = ClassicalRegister(1, 'creg')
-        qc = QuantumCircuit(qreg, creg, name="test-circuit-three-qubits")
-        add_and(qc, qreg[0], qreg[1], qreg[2])
-        qc.measure(qreg[2], creg[0])
+        input = QuantumRegister(2, 'input')
+        output = QuantumRegister(1, 'output')
+        input_measure = ClassicalRegister(2, 'input-measure')
+        output_measure = ClassicalRegister(1, 'output-measure')
+        qc = QuantumCircuit(input, output, input_measure, output_measure, name="test-circuit")
+
+        # Mix states to get randomized test cases and record them
+        qc.h(input)
+        qc.measure(input, input_measure)
+        # Add circuit to test
+        add_xor(qc, input[0], input[1], output[0])
+        # Measure results
+        qc.measure(output, output_measure)
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
@@ -108,31 +101,28 @@ class TestClassicalLogicOperations:
         result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
                                     job.result().get_counts(qc).items()}
 
-        # Then
-        expected_results: Dict[str, float] = {'0': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
+        # Expected Results are strings 'output input'
+        expected_results: Dict[str, float] = {'0 00': 0.25,
+                                              '1 01': 0.25,
+                                              '1 10': 0.25,
+                                              '0 11': 0.25}
+        assert result == approx(expected_results, abs=config['absolute_error'])
 
-    def test_and_on_0_1(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
-        """
-        Test an AND gate implemented via a Toffoli gate::
-
-        |qreg_0: |0>──■─────
-        |             │
-        |qreg_1: |1>──■─────
-        |           ┌─┴─┐┌─┐
-        |qreg_2: |0>┤ X ├┤M├
-        |           └───┘└╥┘
-        | creg_0: 0 ══════╩═
-
-        Variables are qreg_0 and qreg_1.
-        """
+    def test_or(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
         # Given
-        qreg = QuantumRegister(3, 'qreg')
-        creg = ClassicalRegister(1, 'creg')
-        qc = QuantumCircuit(qreg, creg, name="test-circuit-three-qubits")
-        qc.x(qreg[1])
-        add_and(qc, qreg[0], qreg[1], qreg[2])
-        qc.measure(qreg[2], creg[0])
+        input = QuantumRegister(2, 'input')
+        output = QuantumRegister(1, 'output')
+        input_measure = ClassicalRegister(2, 'input-measure')
+        output_measure = ClassicalRegister(1, 'output-measure')
+        qc = QuantumCircuit(input, output, input_measure, output_measure, name="test-circuit")
+
+        # Mix states to get randomized test cases and record them
+        qc.h(input)
+        qc.measure(input, input_measure)
+        # Add circuit to test
+        add_or(qc, input[0], input[1], output[0])
+        # Measure results
+        qc.measure(output, output_measure)
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
@@ -140,319 +130,9 @@ class TestClassicalLogicOperations:
         result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
                                     job.result().get_counts(qc).items()}
 
-        # Then
-        expected_results: Dict[str, float] = {'0': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
-
-    def test_and_on_1_0(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
-        """
-        Test a AND gate implemented via a Toffoli gate::
-
-        |qreg_0: |1>──■─────
-        |             │
-        |qreg_1: |0>──■─────
-        |           ┌─┴─┐┌─┐
-        |qreg_2: |0>┤ X ├┤M├
-        |           └───┘└╥┘
-        | creg_0: 0 ══════╩═
-
-        Variables are qreg_0 and qreg_1.
-        """
-        # Given
-        qreg = QuantumRegister(3, 'qreg')
-        creg = ClassicalRegister(1, 'creg')
-        qc = QuantumCircuit(qreg, creg, name="test-circuit-three-qubits")
-        qc.x(qreg[0])
-        add_and(qc, qreg[0], qreg[1], qreg[2])
-        qc.measure(qreg[2], creg[0])
-
-        # When
-        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        # Calculate relative results
-        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job.result().get_counts(qc).items()}
-
-        # Then
-        expected_results: Dict[str, float] = {'0': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
-
-    def test_and_on_1_1(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
-        """
-        Test a AND gate implemented via a Toffoli gate::
-
-        |qreg_0: |1>──■─────
-        |             │
-        |qreg_1: |1>──■─────
-        |           ┌─┴─┐┌─┐
-        |qreg_2: |0>┤ X ├┤M├
-        |           └───┘└╥┘
-        | creg_0: 0 ══════╩═
-
-        Variables are qreg_0 and qreg_1.
-        """
-        # Given
-        qreg = QuantumRegister(3, 'qreg')
-        creg = ClassicalRegister(1, 'creg')
-        qc = QuantumCircuit(qreg, creg, name="test-circuit-three-qubits")
-        qc.x(qreg[0])
-        qc.x(qreg[1])
-        add_and(qc, qreg[0], qreg[1], qreg[2])
-        qc.measure(qreg[2], creg[0])
-
-        # When
-        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        # Calculate relative results
-        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job.result().get_counts(qc).items()}
-
-        # Then
-        expected_results: Dict[str, float] = {'1': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
-
-    def test_xor_on_0_0(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
-        """
-        Test a XOR gate implemented via a CNOT gate::
-
-        |qreg_0: |0>──■─────
-        |           ┌─┴─┐┌─┐
-        |qreg_1: |0>┤ X ├┤M├
-        |           └───┘└╥┘
-        | creg_0: 0 ══════╩═
-
-        Variables are q0_0 and q0_2.
-        """
-        # Given
-        qreg = QuantumRegister(3, 'qreg')
-        creg = ClassicalRegister(1, 'creg')
-        qc = QuantumCircuit(qreg, creg, name="test-circuit")
-        add_xor(qc, qreg[0], qreg[1], qreg[2])
-        qc.measure(qreg[2], creg[0])
-
-        # When
-        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        # Calculate relative results
-        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job.result().get_counts(qc).items()}
-
-        # Then
-        expected_results: Dict[str, float] = {'0': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
-
-    def test_xor_on_0_1(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
-        """
-        Test a XOR gate implemented via a CNOT gate::
-
-        |qreg_0: |0>──■─────
-        |           ┌─┴─┐┌─┐
-        |qreg_1: |1>┤ X ├┤M├
-        |           └───┘└╥┘
-        | creg_0: 0 ══════╩═
-
-        Variables are q0_0 and q0_2.
-        """
-        # Given
-        qreg = QuantumRegister(3, 'qreg')
-        creg = ClassicalRegister(1, 'creg')
-        qc = QuantumCircuit(qreg, creg, name="test-circuit")
-        qc.x(qreg[1])
-        add_xor(qc, qreg[0], qreg[1], qreg[2])
-        qc.measure(qreg[2], creg[0])
-
-        # When
-        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        # Calculate relative results
-        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job.result().get_counts(qc).items()}
-
-        # Then
-        expected_results: Dict[str, float] = {'1': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
-
-    def test_xor_on_1_0(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
-        """
-        Test a XOR gate implemented via a CNOT gate::
-
-        |qreg_0: |1>──■─────
-        |           ┌─┴─┐┌─┐
-        |qreg_1: |0>┤ X ├┤M├
-        |           └───┘└╥┘
-        | creg_0: 0 ══════╩═
-
-        Variables are q0_0 and q0_2.
-        """
-        # Given
-        qreg = QuantumRegister(3, 'qreg')
-        creg = ClassicalRegister(1, 'creg')
-        qc = QuantumCircuit(qreg, creg, name="test-circuit")
-        qc.x(qreg[0])
-        add_xor(qc, qreg[0], qreg[1], qreg[2])
-        qc.measure(qreg[2], creg[0])
-
-        # When
-        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        # Calculate relative results
-        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job.result().get_counts(qc).items()}
-
-        # Then
-        expected_results: Dict[str, float] = {'1': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
-
-    def test_xor_on_1_1(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
-        """
-        Test a XOR gate implemented via a CNOT gate::
-
-        |qreg_0: |1>──■─────
-        |           ┌─┴─┐┌─┐
-        |qreg_1: |1>┤ X ├┤M├
-        |           └───┘└╥┘
-        | creg_0: 0 ══════╩═
-
-        Variables are q0_0 and q0_2.
-        """
-        # Given
-        qreg = QuantumRegister(3, 'qreg')
-        creg = ClassicalRegister(1, 'creg')
-        qc = QuantumCircuit(qreg, creg, name="test-circuit")
-        qc.x(qreg[0])
-        qc.x(qreg[1])
-        add_xor(qc, qreg[0], qreg[1], qreg[2])
-        qc.measure(qreg[2], creg[0])
-
-        # When
-        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        # Calculate relative results
-        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job.result().get_counts(qc).items()}
-
-        # Then
-        expected_results: Dict[str, float] = {'0': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
-
-    def test_or_on_0_0(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
-        """
-        Test a OR gate implemented via CNOT and Tofoli gates::
-
-        |qreg_0: |0>──■─────────■─────
-        |             │         │  ┌─┐
-        |qreg_1: |0>──┼────■────■──┤M├
-        |           ┌─┴─┐┌─┴─┐┌─┴─┐└╥┘
-        |qreg_2: |0>┤ X ├┤ X ├┤ X ├─╫─
-        |           └───┘└───┘└───┘ ║
-        | creg_0: 0 ════════════════╩═
-
-        Variables are qreg_0 and qreg_1 and input qreg_2 is assumed to be |0>.
-        """
-        # Given
-        qreg = QuantumRegister(3, 'qreg')
-        creg = ClassicalRegister(1, 'creg')
-        qc = QuantumCircuit(qreg, creg, name="test-circuit")
-        add_or(qc, qreg[0], qreg[1], qreg[2])
-        qc.measure(qreg[2], creg[0])
-
-        # When
-        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        # Calculate relative results
-        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job.result().get_counts(qc).items()}
-
-        # Then
-        expected_results: Dict[str, float] = {'0': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
-
-    def test_or_on_0_1(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
-        """
-        Test a OR gate implemented via CNOT and Tofoli gates::
-
-        |qreg_0: |0>──■─────────■─────
-        |             │         │  ┌─┐
-        |qreg_1: |1>──┼────■────■──┤M├
-        |           ┌─┴─┐┌─┴─┐┌─┴─┐└╥┘
-        |qreg_2: |0>┤ X ├┤ X ├┤ X ├─╫─
-        |           └───┘└───┘└───┘ ║
-        | creg_0: 0 ════════════════╩═
-
-        Variables are qreg_0 and qreg_1 and input qreg_2 is assumed to be |1>.
-        """
-        # Given
-        qreg = QuantumRegister(3, 'qreg')
-        creg = ClassicalRegister(1, 'creg')
-        qc = QuantumCircuit(qreg, creg, name="test-circuit")
-        qc.x(qreg[1])
-        add_or(qc, qreg[0], qreg[1], qreg[2])
-        qc.measure(qreg[2], creg[0])
-
-        # When
-        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        # Calculate relative results
-        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job.result().get_counts(qc).items()}
-
-        # Then
-        expected_results: Dict[str, float] = {'1': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
-
-    def test_or_on_1_0(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
-        """
-        Test a OR gate implemented via CNOT and Tofoli gates::
-
-        |qreg_0: |1>──■─────────■─────
-        |             │         │  ┌─┐
-        |qreg_1: |0>──┼────■────■──┤M├
-        |           ┌─┴─┐┌─┴─┐┌─┴─┐└╥┘
-        |qreg_2: |0>┤ X ├┤ X ├┤ X ├─╫─
-        |           └───┘└───┘└───┘ ║
-        | creg_0: 0 ════════════════╩═
-
-        Variables are qreg_0 and qreg_1 and input qreg_2 is assumed to be |1>.
-        """
-        # Given
-        qreg = QuantumRegister(3, 'qreg')
-        creg = ClassicalRegister(1, 'creg')
-        qc = QuantumCircuit(qreg, creg, name="test-circuit")
-        qc.x(qreg[0])
-        add_or(qc, qreg[0], qreg[1], qreg[2])
-        qc.measure(qreg[2], creg[0])
-
-        # When
-        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        # Calculate relative results
-        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job.result().get_counts(qc).items()}
-
-        # Then
-        expected_results: Dict[str, float] = {'1': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
-
-    def test_or_on_1_1(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
-        """
-        Test a OR gate implemented via CNOT and Tofoli gates::
-
-        |qreg_0: |1>──■─────────■─────
-        |             │         │  ┌─┐
-        |qreg_1: |1>──┼────■────■──┤M├
-        |           ┌─┴─┐┌─┴─┐┌─┴─┐└╥┘
-        |qreg_2: |0>┤ X ├┤ X ├┤ X ├─╫─
-        |           └───┘└───┘└───┘ ║
-        | creg_0: 0 ════════════════╩═
-
-        Variables are qreg_0 and qreg_1 and input qreg_2 is assumed to be |1>.
-        """
-        # Given
-        qreg = QuantumRegister(3, 'qreg')
-        creg = ClassicalRegister(1, 'creg')
-        qc = QuantumCircuit(qreg, creg, name="test-circuit")
-        qc.x(qreg[0])
-        qc.x(qreg[1])
-        add_or(qc, qreg[0], qreg[1], qreg[2])
-        qc.measure(qreg[2], creg[0])
-
-        # When
-        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        # Calculate relative results
-        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job.result().get_counts(qc).items()}
-
-        # Then
-        expected_results: Dict[str, float] = {'1': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
+        # Expected Results are strings 'output input'
+        expected_results: Dict[str, float] = {'0 00': 0.25,
+                                              '1 01': 0.25,
+                                              '1 10': 0.25,
+                                              '1 11': 0.25}
+        assert result == approx(expected_results, abs=config['absolute_error'])
