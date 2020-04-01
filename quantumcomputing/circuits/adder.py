@@ -6,7 +6,7 @@
 
 from qiskit import QuantumCircuit
 from qiskit.circuit import Qubit
-from quantumcomputing.gates.classic import (add_xor, add_and)
+from quantumcomputing.circuits.classic import (add_xor, add_and)
 
 
 def add_half_adder(qc: QuantumCircuit, a: Qubit, b: Qubit, sum: Qubit, carry: Qubit) -> None:

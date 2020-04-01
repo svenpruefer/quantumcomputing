@@ -10,7 +10,7 @@ import pytest
 from qiskit import *
 from qiskit.providers import *
 
-from gates.grover import _add_grover_reflection
+from circuits.grover import _add_grover_reflection
 
 
 class TestGroverReflection:

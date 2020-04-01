@@ -10,7 +10,7 @@ import pytest
 from pytest import approx
 from qiskit import *
 from qiskit.providers import *
-from quantumcomputing.gates.grover import add_grover_without_ancilla_1_0, add_grover_with_ancilla_1_0
+from quantumcomputing.circuits.grover import add_grover_without_ancilla_1_0, add_grover_with_ancilla_1_0
 import matplotlib.pyplot as plt
 
 

@@ -10,7 +10,7 @@ import pytest
 from pytest import approx
 from qiskit import *
 from qiskit.providers import *
-from quantumcomputing.gates.classic import *
+from quantumcomputing.circuits.classic import *
 
 
 class TestClassicalLogicOperations:
