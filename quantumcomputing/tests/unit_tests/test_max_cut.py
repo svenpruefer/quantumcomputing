@@ -22,7 +22,7 @@ class TestFullAdder:
     @pytest.fixture
     def config(self) -> Dict[str, Any]:
         return {'test_runs': 10000,
-                'absolute_error': 0.02}
+                'absolute_error': 0.03}
 
     def test_max_cut_on_default_example(self, simulator, config) -> None:
         # Given
