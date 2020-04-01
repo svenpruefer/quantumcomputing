@@ -5,7 +5,7 @@
 # Copyright (c) 2020 by DLR.
 
 from qiskit import QuantumCircuit, QuantumRegister
-from qiskit.circuit import Qubit, Clbit
+from qiskit.circuit import Qubit
 
 
 def _add_2_bit_oracle_without_ancilla_1_0(qc: QuantumCircuit, register: QuantumRegister) -> None:
