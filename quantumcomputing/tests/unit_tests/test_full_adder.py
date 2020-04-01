@@ -21,41 +21,25 @@ class TestFullAdder:
 
     @pytest.fixture
     def config(self) -> Dict[str, Any]:
-        return {'test_runs': 1000,
-                'relative_error': 0.05}
+        return {'test_runs': 10000,
+                'absolute_error': 0.01}
 
-    def test_full_adder_on_0_0_0(self, simulator, config) -> None:
-        input_reg = QuantumRegister(3, 'input')
-        carry_reg = QuantumRegister(2, 'carry')
-        sum_reg = QuantumRegister(2, 'sum')
-        measure = ClassicalRegister(2, 'measure')
-        qc = QuantumCircuit(input_reg, carry_reg, sum_reg, measure, name="half-adder-circuit")
-        # Prepare Input
-        add_full_adder_7(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
-        qc.measure(sum_reg[1], measure[1])
-        qc.measure(carry_reg[1], measure[0])
+    def test_full_adder_7(self, simulator, config) -> None:
+        # Given
+        input = QuantumRegister(3, 'input')
+        aux = QuantumRegister(2, 'aux')
+        output = QuantumRegister(2, 'output')
+        input_measure = ClassicalRegister(3, 'input-measure')
+        output_measure = ClassicalRegister(2, 'output-measure')
+        qc = QuantumCircuit(input, aux, output, input_measure, output_measure, name="full-adder-7-circuit")
 
-        # When
-        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        # Calculate relative results
-        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job.result().get_counts(qc).items()}
-
-        # Then
-        expected_results: Dict[str, float] = {'00': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
-
-    def test_full_adder_on_0_0_1(self, simulator, config) -> None:
-        input_reg = QuantumRegister(3, 'input')
-        carry_reg = QuantumRegister(2, 'carry')
-        sum_reg = QuantumRegister(2, 'sum')
-        measure = ClassicalRegister(2, 'measure')
-        qc = QuantumCircuit(input_reg, carry_reg, sum_reg, measure, name="half-adder-circuit")
-        # Prepare Input
-        qc.x(input_reg[2])
-        add_full_adder_7(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
-        qc.measure(sum_reg[1], measure[1])
-        qc.measure(carry_reg[1], measure[0])
+        # Mix states to get randomized test cases and record them
+        qc.h(input)
+        qc.measure(input, input_measure)
+        # Add full adder
+        add_full_adder_7(qc, input[0], input[1], input[2], aux[0], aux[1], output[0], output[1])
+        # Measure results
+        qc.measure(output, output_measure)
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
@@ -64,162 +48,13 @@ class TestFullAdder:
                                     job.result().get_counts(qc).items()}
 
         # Then
-        expected_results: Dict[str, float] = {'10': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
-
-    def test_full_adder_on_0_1_0(self, simulator, config) -> None:
-        input_reg = QuantumRegister(3, 'input')
-        carry_reg = QuantumRegister(2, 'carry')
-        sum_reg = QuantumRegister(2, 'sum')
-        measure = ClassicalRegister(2, 'measure')
-        qc = QuantumCircuit(input_reg, carry_reg, sum_reg, measure, name="half-adder-circuit")
-        # Prepare Input
-        qc.x(input_reg[1])
-        add_full_adder_7(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
-        qc.measure(sum_reg[1], measure[1])
-        qc.measure(carry_reg[1], measure[0])
-
-        # When
-        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        # Calculate relative results
-        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job.result().get_counts(qc).items()}
-
-        # Then
-        expected_results: Dict[str, float] = {'10': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
-
-    def test_full_adder_on_1_0_0(self, simulator, config) -> None:
-        input_reg = QuantumRegister(3, 'input')
-        carry_reg = QuantumRegister(2, 'carry')
-        sum_reg = QuantumRegister(2, 'sum')
-        measure = ClassicalRegister(2, 'measure')
-        qc = QuantumCircuit(input_reg, carry_reg, sum_reg, measure, name="half-adder-circuit")
-        # Prepare Input
-        qc.x(input_reg[0])
-        add_full_adder_7(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
-        qc.measure(sum_reg[1], measure[1])
-        qc.measure(carry_reg[1], measure[0])
-
-        # When
-        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        # Calculate relative results
-        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job.result().get_counts(qc).items()}
-
-        # Then
-        expected_results: Dict[str, float] = {'10': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
-
-    def test_full_adder_on_1_1_0(self, simulator, config) -> None:
-        input_reg = QuantumRegister(3, 'input')
-        carry_reg = QuantumRegister(2, 'carry')
-        sum_reg = QuantumRegister(2, 'sum')
-        measure = ClassicalRegister(2, 'measure')
-        qc = QuantumCircuit(input_reg, carry_reg, sum_reg, measure, name="half-adder-circuit")
-        # Prepare Input
-        qc.x(input_reg[0])
-        qc.x(input_reg[1])
-        add_full_adder_7(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
-        qc.measure(sum_reg[1], measure[1])
-        qc.measure(carry_reg[1], measure[0])
-
-        # When
-        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        # Calculate relative results
-        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job.result().get_counts(qc).items()}
-
-        # Then
-        expected_results: Dict[str, float] = {'01': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
-
-    def test_full_adder_on_1_0_1(self, simulator, config) -> None:
-        """
-        Tested circuit::
-
-        |             ┌───┐
-        |   one_0: |0>┤ X ├───────■─────────■────■────────
-        |             ├───┤       │         │    │
-        | input_0: |0>┤ X ├───────┼────■────■────┼────────
-        |             └───┘       │    │    │    │
-        | input_1: |0>───────■────■────┼────┼────┼────────
-        |             ┌───┐  │  ┌─┴─┐  │  ┌─┴─┐  │  ┌─┐
-        | input_2: |0>┤ X ├──■──┤ X ├──■──┤ X ├──┼──┤M├───
-        |             └───┘┌─┴─┐└───┘  │  └───┘┌─┴─┐└╥┘┌─┐
-        | carry_0: |0>─────┤ X ├───────┼───────┤ X ├─╫─┤M├
-        |                  └───┘     ┌─┴─┐     └─┬─┘ ║ └╥┘
-        | carry_1: |0>───────────────┤ X ├───────■───╫──╫─
-        |                            └───┘           ║  ║
-        |measure_0: 0 ═══════════════════════════════╩══╬═
-        |                                               ║
-        |measure_1: 0 ══════════════════════════════════╩═
-        """
-        input_reg = QuantumRegister(3, 'input')
-        carry_reg = QuantumRegister(2, 'carry')
-        sum_reg = QuantumRegister(2, 'sum')
-        measure = ClassicalRegister(2, 'measure')
-        qc = QuantumCircuit(input_reg, carry_reg, sum_reg, measure, name="half-adder-circuit")
-        # Prepare Input
-        qc.x(input_reg[0])
-        qc.x(input_reg[2])
-        add_full_adder_7(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
-        qc.measure(sum_reg[1], measure[1])
-        qc.measure(carry_reg[1], measure[0])
-
-        # When
-        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        # Calculate relative results
-        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job.result().get_counts(qc).items()}
-
-        # Then
-        expected_results: Dict[str, float] = {'01': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
-
-    def test_full_adder_on_0_1_1(self, simulator, config) -> None:
-        input_reg = QuantumRegister(3, 'input')
-        carry_reg = QuantumRegister(2, 'carry')
-        sum_reg = QuantumRegister(2, 'sum')
-        measure = ClassicalRegister(2, 'measure')
-        qc = QuantumCircuit(input_reg, carry_reg, sum_reg, measure, name="half-adder-circuit")
-        # Prepare Input
-        qc.x(input_reg[1])
-        qc.x(input_reg[2])
-        add_full_adder_7(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
-        qc.measure(sum_reg[1], measure[1])
-        qc.measure(carry_reg[1], measure[0])
-
-        # When
-        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        # Calculate relative results
-        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job.result().get_counts(qc).items()}
-
-        # Then
-        expected_results: Dict[str, float] = {'01': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
-
-    def test_full_adder_on_1_1_1(self, simulator, config) -> None:
-        input_reg = QuantumRegister(3, 'input')
-        carry_reg = QuantumRegister(2, 'carry')
-        sum_reg = QuantumRegister(2, 'sum')
-        measure = ClassicalRegister(2, 'measure')
-        qc = QuantumCircuit(input_reg, carry_reg, sum_reg, measure, name="half-adder-circuit")
-        # Prepare Input
-        qc.x(input_reg[0])
-        qc.x(input_reg[1])
-        qc.x(input_reg[2])
-        add_full_adder_7(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
-        qc.measure(sum_reg[1], measure[1])
-        qc.measure(carry_reg[1], measure[0])
-
-        # When
-        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        # Calculate relative results
-        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job.result().get_counts(qc).items()}
-
-        # Then
-        expected_results: Dict[str, float] = {'11': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
+        # Expected Results are strings 'output input', where output is 'carry' + 'sum'
+        expected_results: Dict[str, float] = {'00 000': 0.125,
+                                              '01 001': 0.125,
+                                              '01 010': 0.125,
+                                              '01 100': 0.125,
+                                              '10 011': 0.125,
+                                              '10 101': 0.125,
+                                              '10 110': 0.125,
+                                              '11 111': 0.125}
+        assert result == approx(expected_results, abs=config['absolute_error'])
