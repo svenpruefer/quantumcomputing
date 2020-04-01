@@ -84,5 +84,5 @@ class TestFullAdder:
                                               '1 1101': 0,
                                               '1 1110': 0.25,
                                               '1 1111': 0}
-        assert calc_total_costs(qc) == 1538
         assert result == approx(expected_results, abs=config['absolute_error'])
+        assert calc_total_costs(qc) == 1374

@@ -9,7 +9,7 @@ from qiskit.circuit import Qubit
 
 from circuits.adder import add_full_adder_5, add_full_adder_5_reverse
 from circuits.classic import add_xor
-from circuits.grover import add_grover_reflection_no_ancilla
+from circuits.grover import add_grover_reflection_no_ancilla, add_grover_reflection_with_ancilla
 
 
 def add_max_cut_circuit(qc: QuantumCircuit, vertices: QuantumRegister, edges: QuantumRegister,
@@ -54,7 +54,7 @@ def _add_max_cut_step(qc: QuantumCircuit, vertices: QuantumRegister, edges: Quan
     :param ancilla: Ancillary qubit to flip phase of target states.
     """
     _add_max_cut_oracle(qc, vertices, edges, summation, ancilla)
-    add_grover_reflection_no_ancilla(qc, vertices)
+    add_grover_reflection_with_ancilla(qc, vertices, [summation[0]])
 
 
 def _add_max_cut_oracle(qc: QuantumCircuit, vertices: QuantumRegister, edges: QuantumRegister,

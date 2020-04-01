@@ -29,7 +29,7 @@ class TestGroverReflection:
         qc = QuantumCircuit(register, name="test-circuit")
         add_grover_reflection_no_ancilla(qc, register)
 
-        pass  # TODO Implement test for Grover reflection
+        pass  # TODO Implement test for Grover reflection without ancilla qubits
 
     def test_grover_reflection_with_ancilla(self, simulator, config):
         register = QuantumRegister(5, name="input")
@@ -37,4 +37,4 @@ class TestGroverReflection:
         qc = QuantumCircuit(register, ancilla, name="test-circuit")
         add_grover_reflection_with_ancilla(qc, register, list(ancilla))
 
-        pass  # TODO Implement test for Grover reflection
+        pass  # TODO Implement test for Grover reflection with ancilla qubits
