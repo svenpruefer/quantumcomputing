@@ -10,12 +10,77 @@ from quantumcomputing.gates.classic import (add_xor, add_and)
 
 
 def add_half_adder(qc: QuantumCircuit, a: Qubit, b: Qubit, sum: Qubit, carry: Qubit) -> None:
+    """
+    Add a half adder to a QuantumCircuit.
+    The circuit will look like the following::
+
+    | TODO
+
+    :param qc: Underlying QuantumCircuit.
+    :param a: First qubit to be added.
+    :param b: Second qubit to be added.
+    :param sum: a XOR b will be XORed to initial state of this qubit, i.e this will be a XOR b, if initial state was |0>.
+    :param carry: a AND b will be XORed to initial state of this qubit, i.e this will be a AND b, if initial state was |0>.
+    """
     add_and(qc, a, b, carry)
     add_xor(qc, a, b, sum)
 
 
-def add_full_adder(qc: QuantumCircuit, a: Qubit, b: Qubit, c: Qubit, sum_1: Qubit, carry_1: Qubit, sum_2: Qubit,
-                   carry_2: Qubit) -> None:
-    add_half_adder(qc, b, c, sum_1, carry_1)
-    add_half_adder(qc, a, sum_1, sum_2, carry_2)
-    qc.cx(carry_1, carry_2)
+def add_full_adder_7(qc: QuantumCircuit, a: Qubit, b: Qubit, c: Qubit, aux_1: Qubit, aux_2: Qubit, sum: Qubit,
+                     carry: Qubit) -> None:
+    """
+    Add a full adder using two ancillary qubits to a QuantumCircuit.
+    The circuit will look like the following::
+
+    | TODO
+
+    :param qc: Underlying QuantumCircuit.
+    :param a: First qubit to be added, not modified.
+    :param b: Second qubit to be added, not modified.
+    :param c: Third qubit to be added, not modified, usually the carry of a formerly applied full adder.
+    :param aux_1: Ancillary qubit. Result will be initial state XORed with (a XOR b), i.e. this will be (a XOR b) if initial state was |0>.
+    :param aux_2: Ancillary qubit. Result will be initial state XORed with (a AND b), i.e. this will be (a AND b) if initial state was |0>.
+    :param sum: (a XOR b XOR c) will be XORed to initial state of this qubit, i.e this will be (a XOR b XOR c), if initial state was |0>.
+    :param carry: Carry of a + b + c will be XORed to initial state of this qubit, i.e this will be the carry of a + b +c, if initial state was |0>.
+    """
+    add_half_adder(qc, a, b, aux_1, aux_2)
+    add_half_adder(qc, c, aux_1, sum, carry)
+    qc.cx(aux_2, carry)
+
+
+def add_full_adder_6(qc: QuantumCircuit, a: Qubit, b: Qubit, c: Qubit, aux: Qubit, sum: Qubit, carry: Qubit) -> None:
+    """
+    Add a full adder using one ancillary qubit to a QuantumCircuit.
+    The circuit will look like the following::
+
+    | TODO
+
+    :param qc: Underlying QuantumCircuit.
+    :param a: First qubit to be added, not modified.
+    :param b: Second qubit to be added, not modified.
+    :param c: Third qubit to be added, not modified, usually the carry of a formerly applied full adder.
+    :param aux: Ancillary qubit. Result will be initial state XORed with (a XOR b), i.e. this will be (a XOR b) if initial state was |0>.
+    :param sum: (a XOR b XOR c) will be XORed to initial state of this qubit, i.e this will be (a XOR b XOR c), if initial state was |0>.
+    :param carry: Carry of a + b + c will be XORed to initial state of this qubit, i.e this will be the carry of a + b +c, if initial state was |0>.
+    """
+    add_half_adder(qc, a, b, aux, carry)
+    add_half_adder(qc, c, aux, sum, carry)
+
+
+def add_full_adder_5(qc: QuantumCircuit, a: Qubit, b: Qubit, c: Qubit, sum: Qubit, carry: Qubit) -> None:
+    """
+    Add a full adder to a QuantumCircuit.
+    The circuit will look like the following::
+
+    | TODO
+
+    :param qc: Underlying QuantumCircuit.
+    :param a: First qubit to be added, not modified.
+    :param b: Second qubit to be added, not modified.
+    :param c: Third qubit to be added, not modified, usually the carry of a formerly applied full adder.
+    :param sum: (a XOR b XOR c) will be XORed to initial state of this qubit, i.e this will be (a XOR b XOR c), if initial state was |0>.
+    :param carry: Carry of a + b + c will be XORed to initial state of this qubit, i.e this will be the carry of a + b +c, if initial state was |0>.
+    """
+    add_half_adder(qc, a, b, sum, carry)
+    qc.ccx(c, sum, carry)
+    qc.cx(c, sum)

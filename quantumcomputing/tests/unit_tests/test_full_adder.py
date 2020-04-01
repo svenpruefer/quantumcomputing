@@ -10,7 +10,7 @@ import pytest
 from pytest import approx
 from qiskit import *
 from qiskit.providers import *
-from quantumcomputing.gates.adder import add_full_adder
+from quantumcomputing.gates.adder import add_full_adder_7
 
 
 class TestFullAdder:
@@ -31,7 +31,7 @@ class TestFullAdder:
         measure = ClassicalRegister(2, 'measure')
         qc = QuantumCircuit(input_reg, carry_reg, sum_reg, measure, name="half-adder-circuit")
         # Prepare Input
-        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
+        add_full_adder_7(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
         qc.measure(sum_reg[1], measure[1])
         qc.measure(carry_reg[1], measure[0])
 
@@ -53,7 +53,7 @@ class TestFullAdder:
         qc = QuantumCircuit(input_reg, carry_reg, sum_reg, measure, name="half-adder-circuit")
         # Prepare Input
         qc.x(input_reg[2])
-        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
+        add_full_adder_7(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
         qc.measure(sum_reg[1], measure[1])
         qc.measure(carry_reg[1], measure[0])
 
@@ -75,7 +75,7 @@ class TestFullAdder:
         qc = QuantumCircuit(input_reg, carry_reg, sum_reg, measure, name="half-adder-circuit")
         # Prepare Input
         qc.x(input_reg[1])
-        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
+        add_full_adder_7(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
         qc.measure(sum_reg[1], measure[1])
         qc.measure(carry_reg[1], measure[0])
 
@@ -97,7 +97,7 @@ class TestFullAdder:
         qc = QuantumCircuit(input_reg, carry_reg, sum_reg, measure, name="half-adder-circuit")
         # Prepare Input
         qc.x(input_reg[0])
-        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
+        add_full_adder_7(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
         qc.measure(sum_reg[1], measure[1])
         qc.measure(carry_reg[1], measure[0])
 
@@ -120,7 +120,7 @@ class TestFullAdder:
         # Prepare Input
         qc.x(input_reg[0])
         qc.x(input_reg[1])
-        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
+        add_full_adder_7(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
         qc.measure(sum_reg[1], measure[1])
         qc.measure(carry_reg[1], measure[0])
 
@@ -163,7 +163,7 @@ class TestFullAdder:
         # Prepare Input
         qc.x(input_reg[0])
         qc.x(input_reg[2])
-        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
+        add_full_adder_7(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
         qc.measure(sum_reg[1], measure[1])
         qc.measure(carry_reg[1], measure[0])
 
@@ -186,7 +186,7 @@ class TestFullAdder:
         # Prepare Input
         qc.x(input_reg[1])
         qc.x(input_reg[2])
-        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
+        add_full_adder_7(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
         qc.measure(sum_reg[1], measure[1])
         qc.measure(carry_reg[1], measure[0])
 
@@ -210,7 +210,7 @@ class TestFullAdder:
         qc.x(input_reg[0])
         qc.x(input_reg[1])
         qc.x(input_reg[2])
-        add_full_adder(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
+        add_full_adder_7(qc, input_reg[0], input_reg[1], input_reg[2], sum_reg[0], carry_reg[0], sum_reg[1], carry_reg[1])
         qc.measure(sum_reg[1], measure[1])
         qc.measure(carry_reg[1], measure[0])
 
