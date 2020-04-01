@@ -11,6 +11,7 @@ from pytest import approx
 from qiskit import *
 from qiskit.providers import *
 from quantumcomputing.gates.grover import add_grover_without_ancilla_1_0, add_grover_with_ancilla_1_0
+import matplotlib.pyplot as plt
 
 
 class TestGrover:
@@ -28,27 +29,25 @@ class TestGrover:
         """
         This tests the following circuit::
 
-        |           ┌───┐┌───┐   ┌───┐ ░ ┌───┐ ░ ┌───┐┌───┐┌───┐┌───┐┌───┐ ░ ┌───┐ ░ ┌─┐
-        |qreg_0: |0>┤ H ├┤ X ├─■─┤ X ├─░─┤ H ├─░─┤ X ├┤ H ├┤ X ├┤ H ├┤ X ├─░─┤ H ├─░─┤M├
-        |           ├───┤└───┘ │ └───┘ ░ ├───┤ ░ ├───┤└───┘└─┬─┘├───┤└───┘ ░ ├───┤ ░ └╥┘
-        |qreg_1: |0>┤ H ├──────■───────░─┤ H ├─░─┤ X ├───────■──┤ X ├──────░─┤ H ├─░──╫─
-        |           └───┘              ░ └───┘ ░ └───┘          └───┘      ░ └───┘ ░  ║
+        |           ┌───┐┌───┐   ┌───┐ ░ ┌───┐┌───┐┌───┐┌───┐┌───┐┌───┐┌───┐ ░ ┌─┐
+        |qreg_0: |0>┤ H ├┤ X ├─■─┤ X ├─░─┤ H ├┤ X ├┤ H ├┤ X ├┤ H ├┤ X ├┤ H ├─░─┤M├──────
+        |           ├───┤└───┘ │ └───┘ ░ ├───┤├───┤└───┘└─┬─┘├───┤└───┘├───┤ ░ └╥┘   ┌─┐
+        |qreg_1: |0>┤ H ├──────■───────░─┤ H ├┤ X ├───────■──┤ X ├─────┤ H ├─░──╫────┤M├
+        |           └───┘              ░ └───┘└───┘          └───┘     └───┘ ░  ║    └╥┘
         | creg_0: 0 ══════════════════════════════════════════════════════════════════╩═
-        |
-        | creg_1: 0 ════════════════════════════════════════════════════════════════════
+        |                                                                             ║
+        | creg_1: 0 ══════════════════════════════════════════════════════════════════╩═
 
         """
-        qreg = QuantumRegister(2, "qreg")
-        creg = ClassicalRegister(2, "creg")
-        qc = QuantumCircuit(qreg, creg, name="grover-without-ancilla-circuit")
+        input = QuantumRegister(2, "input")
+        measure = ClassicalRegister(2, "measure")
+        qc = QuantumCircuit(input, measure, name="grover-without-ancilla-circuit")
 
-        # Mix states
-        qc.h(qreg)
-        # Add one Grover step
-        add_grover_without_ancilla_1_0(qc, qreg[0], qreg[1])
+        # Add Grover algorithm
+        add_grover_without_ancilla_1_0(qc, input)
+
         # Measure
-        qc.measure(qreg[0], creg[0])
-        qc.measure(qreg[1], creg[1])
+        qc.measure(input, measure)
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
@@ -58,20 +57,22 @@ class TestGrover:
 
         # Then
         expected_results: Dict[str, float] = {'10': 1}
+        qc.draw()
+        plt.show()
         assert result == approx(expected_results, rel=config['relative_error'])
 
     def test_grover_with_ancilla_on_1_0(self, simulator, config):
-        qreg = QuantumRegister(2, "input")
+        input = QuantumRegister(2, "input")
         ancilla = QuantumRegister(1, "ancilla")
         measure = ClassicalRegister(2, "measure")
         measure_ancilla = ClassicalRegister(1, "ancilla-measure")
-        qc = QuantumCircuit(qreg, ancilla, measure, measure_ancilla, name="grover-without-ancilla-circuit")
+        qc = QuantumCircuit(input, ancilla, measure, measure_ancilla, name="grover-without-ancilla-circuit")
 
-        # Add one Grover step
-        add_grover_with_ancilla_1_0(qc, qreg[0], qreg[1], ancilla[0], measure_ancilla[0])
+        # Add Grover circuit
+        add_grover_with_ancilla_1_0(qc, input, ancilla[0])
         # Measure
-        qc.measure(qreg[0], measure[0])
-        qc.measure(qreg[1], measure[1])
+        qc.measure(input, measure)
+        qc.measure(ancilla, measure_ancilla)
 
         # When
         job: BaseJob = execute(qc, simulator, shots=config['test_runs'])

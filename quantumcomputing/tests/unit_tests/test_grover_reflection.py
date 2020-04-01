@@ -10,7 +10,7 @@ import pytest
 from qiskit import *
 from qiskit.providers import *
 
-from gates.grover import add_grover_reflection
+from gates.grover import _add_grover_reflection
 
 
 class TestGroverReflection:
@@ -27,6 +27,6 @@ class TestGroverReflection:
     def test_grover_reflection(self, simulator, config):
         register = QuantumRegister(5, name="input")
         qc = QuantumCircuit(register, name="test-circuit")
-        add_grover_reflection(qc, register)
+        _add_grover_reflection(qc, register)
 
         pass  # TODO Implement test for Grover reflection

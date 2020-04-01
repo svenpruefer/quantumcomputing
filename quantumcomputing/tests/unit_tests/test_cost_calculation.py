@@ -22,10 +22,8 @@ class TestCostCalculation:
         creg = ClassicalRegister(2, "creg")
         qc = QuantumCircuit(qreg, creg, name="grover-without-ancilla-circuit")
 
-        # Mix states
-        qc.h(qreg)
         # Add one Grover step
-        add_grover_without_ancilla_1_0(qc, qreg[0], qreg[1])
+        add_grover_without_ancilla_1_0(qc, qreg)
         # Measure
         qc.measure(qreg[0], creg[0])
         qc.measure(qreg[1], creg[1])
@@ -45,7 +43,7 @@ class TestCostCalculation:
         qc = QuantumCircuit(qreg, ancilla, measure, measure_ancilla, name="grover-without-ancilla-circuit")
 
         # Add one Grover step
-        add_grover_with_ancilla_1_0(qc, qreg[0], qreg[1], ancilla[0], measure_ancilla[0])
+        add_grover_with_ancilla_1_0(qc, qreg, ancilla[0])
         # Measure
         qc.measure(qreg[0], measure[0])
         qc.measure(qreg[1], measure[1])
