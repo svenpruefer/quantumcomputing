@@ -10,6 +10,8 @@ import pytest
 from pytest import approx
 from qiskit import *
 from qiskit.providers import *
+
+from costs.costs import calc_total_costs
 from quantumcomputing.circuits.max_cut import add_max_cut_circuit
 
 
@@ -82,4 +84,5 @@ class TestFullAdder:
                                               '1 1101': 0,
                                               '1 1110': 0.25,
                                               '1 1111': 0}
+        assert calc_total_costs(qc) == 1538
         assert result == approx(expected_results, abs=config['absolute_error'])

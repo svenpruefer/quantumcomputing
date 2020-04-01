@@ -10,7 +10,7 @@ from qiskit.transpiler import PassManager
 from qiskit.transpiler.passes import Unroller
 
 
-def calc_u3_cx_gates(qc: QuantumCircuit) -> OrderedDict[str, int]:
+def _calc_u3_cx_gates(qc: QuantumCircuit) -> OrderedDict[str, int]:
     pass_ = Unroller(['u3', 'cx'])
     pm = PassManager(pass_)
     new_circuit = pm.run(qc)
@@ -18,6 +18,16 @@ def calc_u3_cx_gates(qc: QuantumCircuit) -> OrderedDict[str, int]:
 
 
 def calc_total_costs(qc: QuantumCircuit) -> int:
-    counts = calc_u3_cx_gates(qc)
+    """
+    Calculates cost of a QuantumCircuit according to the formula::
+
+       cost = #{u3 gates} + 10 * #{cx gates}
+
+    The number of gates are calculated by using qiskit's built-in unroller.
+
+    :param qc: QuantumCircuit whose costs shall be calculated.
+    :return: The total cost of `qc`.
+    """
+    counts = _calc_u3_cx_gates(qc)
     total = counts['u3'] + 10 * counts['cx']
     return total
