@@ -3,6 +3,7 @@
 # This file is part of quantumcomputing.
 #
 # Copyright (c) 2020 by DLR.
+from typing import List
 
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit.circuit import Qubit
@@ -42,7 +43,7 @@ def _add_grover_step_without_ancilla_1_0(qc: QuantumCircuit, register: QuantumRe
         raise ValueError(f"Need QuantumRegister with exactly 2 qubits, but got {len(list(register))} instead.")
 
     _add_2_bit_oracle_without_ancilla_1_0(qc, register)  # Oracle
-    add_grover_reflection(qc, register)  # Reflection
+    add_grover_reflection_no_ancilla(qc, register)  # Reflection
 
 
 def add_grover_without_ancilla_1_0(qc: QuantumCircuit, register: QuantumRegister) -> None:
@@ -100,7 +101,7 @@ def _add_grover_step_with_ancilla_1_0(qc: QuantumCircuit, register: QuantumRegis
         raise ValueError(f"Need QuantumRegister with exactly 2 qubits, but got {len(list(register))} instead.")
 
     _add_2_bit_oracle_with_ancilla_1_0(qc, register, ancilla)  # Oracle
-    add_grover_reflection(qc, register)  # Reflection
+    add_grover_reflection_no_ancilla(qc, register)  # Reflection
 
 
 def _add_2_bit_oracle_with_ancilla_1_0(qc: QuantumCircuit, register: QuantumRegister, ancilla: Qubit) -> None:
@@ -123,9 +124,11 @@ def _add_2_bit_oracle_with_ancilla_1_0(qc: QuantumCircuit, register: QuantumRegi
     qc.x(register[0])
 
 
-def add_grover_reflection(qc: QuantumCircuit, register: QuantumRegister) -> None:
+def add_grover_reflection_no_ancilla(qc: QuantumCircuit, register: QuantumRegister) -> None:
     """
-    Add a Grover reflection (or amplitude amplification) acting on a specified QuantumRegister in a QuantumCircuit.
+    Add a Grover reflection (or amplitude amplification) acting on a specified QuantumRegister in a QuantumCircuit
+    without the use of an ancilla qubit.
+
     The created circuit will look like the following::
 
     |            ┌───┐┌───┐┌───┐┌───┐┌───┐┌───┐┌───┐
@@ -140,6 +143,8 @@ def add_grover_reflection(qc: QuantumCircuit, register: QuantumRegister) -> None
     |input_4: |0>┤ H ├┤ X ├───────■───────┤ X ├┤ H ├
     |            └───┘└───┘               └───┘└───┘
 
+    Beware that not using an ancilla qubit requires lots of additional quantum gates!
+
     :param qc: Underlying QuantumCircuit.
     :param register: QuantumRegister containing the qubits whose amplitudes shall be amplified.
     """
@@ -147,6 +152,30 @@ def add_grover_reflection(qc: QuantumCircuit, register: QuantumRegister) -> None
     qc.x(register)
     qc.h(register[0])
     qc.mct(q_controls=register[1:], q_target=register[0], q_ancilla=None, mode='noancilla')
+    qc.h(register[0])
+    qc.x(register)
+    qc.h(register)
+
+
+def add_grover_reflection_with_ancilla(qc: QuantumCircuit, register: QuantumRegister, ancillas: List[Qubit]) -> None:
+    """
+    Add a Grover reflection (or amplitude amplification) acting on a specified QuantumRegister in a QuantumCircuit
+    using ancilla qubits.
+
+    Notice that you need `#{qubits in register} - 3` ancilla qubits. This is because this implementation uses a
+    Multi-Toffoli-Gate with one target qubit and the basic qiskit implementation needs `#{control qubits} - 2`
+    ancillary qubits.
+
+    :param qc: Underlying QuantumCircuit.
+    :param register: QuantumRegister containing the qubits whose amplitudes shall be amplified.
+    :param ancillas: List of ancilla qubits to use.
+    """
+    if len(ancillas) < len(list(register)) -3:
+        raise ValueError(f"Need {len(list(register)) -3} many ancilla qubits but got {len(ancillas)}")
+    qc.h(register)
+    qc.x(register)
+    qc.h(register[0])
+    qc.mct(q_controls=register[1:], q_target=register[0], q_ancilla=ancillas)
     qc.h(register[0])
     qc.x(register)
     qc.h(register)

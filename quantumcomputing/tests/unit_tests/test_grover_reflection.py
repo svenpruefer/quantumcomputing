@@ -10,7 +10,7 @@ import pytest
 from qiskit import *
 from qiskit.providers import *
 
-from circuits.grover import add_grover_reflection
+from circuits.grover import add_grover_reflection_no_ancilla, add_grover_reflection_with_ancilla
 
 
 class TestGroverReflection:
@@ -24,9 +24,17 @@ class TestGroverReflection:
         return {'test_runs': 1000,
                 'relative_error': 0.05}
 
-    def test_grover_reflection(self, simulator, config):
+    def test_grover_reflection_without_ancilla(self, simulator, config):
         register = QuantumRegister(5, name="input")
         qc = QuantumCircuit(register, name="test-circuit")
-        add_grover_reflection(qc, register)
+        add_grover_reflection_no_ancilla(qc, register)
+
+        pass  # TODO Implement test for Grover reflection
+
+    def test_grover_reflection_with_ancilla(self, simulator, config):
+        register = QuantumRegister(5, name="input")
+        ancilla = QuantumRegister(2, name="ancilla")
+        qc = QuantumCircuit(register, ancilla, name="test-circuit")
+        add_grover_reflection_with_ancilla(qc, register, list(ancilla))
 
         pass  # TODO Implement test for Grover reflection
