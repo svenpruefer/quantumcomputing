@@ -42,7 +42,7 @@ def _add_grover_step_without_ancilla_1_0(qc: QuantumCircuit, register: QuantumRe
         raise ValueError(f"Need QuantumRegister with exactly 2 qubits, but got {len(list(register))} instead.")
 
     _add_2_bit_oracle_without_ancilla_1_0(qc, register)  # Oracle
-    _add_grover_reflection(qc, register)  # Reflection
+    add_grover_reflection(qc, register)  # Reflection
 
 
 def add_grover_without_ancilla_1_0(qc: QuantumCircuit, register: QuantumRegister) -> None:
@@ -100,7 +100,7 @@ def _add_grover_step_with_ancilla_1_0(qc: QuantumCircuit, register: QuantumRegis
         raise ValueError(f"Need QuantumRegister with exactly 2 qubits, but got {len(list(register))} instead.")
 
     _add_2_bit_oracle_with_ancilla_1_0(qc, register, ancilla)  # Oracle
-    _add_grover_reflection(qc, register)  # Reflection
+    add_grover_reflection(qc, register)  # Reflection
 
 
 def _add_2_bit_oracle_with_ancilla_1_0(qc: QuantumCircuit, register: QuantumRegister, ancilla: Qubit) -> None:
@@ -123,7 +123,7 @@ def _add_2_bit_oracle_with_ancilla_1_0(qc: QuantumCircuit, register: QuantumRegi
     qc.x(register[0])
 
 
-def _add_grover_reflection(qc: QuantumCircuit, register: QuantumRegister) -> None:
+def add_grover_reflection(qc: QuantumCircuit, register: QuantumRegister) -> None:
     """
     Add a Grover reflection (or amplitude amplification) acting on a specified QuantumRegister in a QuantumCircuit.
     The created circuit will look like the following::
