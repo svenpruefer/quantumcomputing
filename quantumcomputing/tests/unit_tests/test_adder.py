@@ -10,7 +10,7 @@ import pytest
 from pytest import approx
 from qiskit import *
 from qiskit.providers import *
-from quantumcomputing.gates.adder import add_full_adder_7, add_full_adder_6, add_full_adder_5
+from quantumcomputing.circuits.adder import add_full_adder_7, add_full_adder_6, add_full_adder_5, add_half_adder
 
 
 class TestFullAdder:
@@ -22,7 +22,37 @@ class TestFullAdder:
     @pytest.fixture
     def config(self) -> Dict[str, Any]:
         return {'test_runs': 10000,
-                'absolute_error': 0.01}
+                'absolute_error': 0.02}
+
+    def test_half_adder(self, simulator, config) -> None:
+        # Given
+        input = QuantumRegister(2, 'input')
+        output = QuantumRegister(2, 'output')
+        input_measure = ClassicalRegister(2, 'input-measure')
+        output_measure = ClassicalRegister(2, 'output-measure')
+        qc = QuantumCircuit(input, output, input_measure, output_measure, name="half-adder-circuit")
+
+        # Mix states to get randomized test cases and record them
+        qc.h(input)
+        qc.measure(input, input_measure)
+        # Add full adder
+        add_half_adder(qc, input[0], input[1], output[0], output[1])
+        # Measure results
+        qc.measure(output, output_measure)
+
+        # When
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job.result().get_counts(qc).items()}
+
+        # Then
+        # Expected Results are strings 'output input', where output is 'carry' + 'sum'
+        expected_results: Dict[str, float] = {'00 00': 0.25,
+                                              '01 01': 0.25,
+                                              '01 10': 0.25,
+                                              '10 11': 0.25}
+        assert result == approx(expected_results, abs=config['absolute_error'])
 
     def test_full_adder_7(self, simulator, config) -> None:
         # Given
