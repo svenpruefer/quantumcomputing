@@ -4,12 +4,13 @@
 #
 # Copyright (c) 2020 by DLR.
 from enum import Enum
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Set
 
+from more_itertools import grouper
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit.circuit import Qubit
 
-from circuits.classic import add_and_4, add_and
+from circuits.classic import add_and_4, add_and, add_and_3
 
 
 class VertexColor(Enum):
@@ -98,6 +99,33 @@ def _compare_4_internal_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegis
         _compare_internal_edge(qc, v1, v2, ancillas[i])
 
 
+def _compare_3_internal_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegister, QuantumRegister]],
+                              ancillas: List[Qubit], target: Qubit) -> None:
+    """
+    Compare colors of three internal vertices using four ancillary qubits and save the result into another qubit.
+
+    Note that this circuit is equal to its own reverse circuit.
+
+    :param qc: Underlying QuantumCircuit.
+    :param edges: A list of 2-tuples of quantum registers corresponding to the colors of the two vertices bordering that edge.
+    :param ancillas: Ancillary qubits to use.
+    :param target: If |0> beforehand, this qubit will be |1> if all four edges are valid.
+    """
+    if len(edges) != 3:
+        raise ValueError(f"Need 3 edges, but got {len(edges)} instead.")
+    if len(ancillas) != 4:
+        raise ValueError(f"Need 4 ancillary qubits, but got {len(ancillas)} instead.")
+    # Compare the three edges and save their results in the 3 lowest ancillary qubits
+    for i, (v1, v2) in enumerate(edges):
+        _compare_internal_edge(qc, v1, v2, ancillas[i])
+    # Combine the three qubits via an AND operation
+    add_and_3(qc, ancillas[0:3], ancillas[3], target)
+    # Reverse the three edge comparisons to make the ancillary qubits |0> again. Note that the internal edge comparisons
+    # all commute, so we don't need to reverse the order.
+    for i, (v1, v2) in enumerate(edges):
+        _compare_internal_edge(qc, v1, v2, ancillas[i])
+
+
 def _compare_2_internal_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegister, QuantumRegister]],
                               ancillas: List[Qubit], target: Qubit) -> None:
     """
@@ -147,6 +175,34 @@ def _compare_2_external_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegis
         _compare_external_edge(qc, v1, v2, ancillas[i])
     # Combine the four qubits via an AND operation
     add_and(qc, ancillas[0], ancillas[1], target)
+    # Reverse the two edge comparisons to make the ancillary qubits |0> again. Note that the internal edge comparisons
+    # all commute, so we don't need to reverse the order.
+    for i, (v1, v2) in enumerate(edges):
+        _compare_external_edge(qc, v1, v2, ancillas[i])
+
+
+def _compare_3_external_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegister, VertexColor]],
+                              ancillas: List[Qubit], target: Qubit) -> None:
+    """
+    Compare correctness of three external edges using four ancillary qubits and save the result into another qubit.
+
+    Note that this circuit is equal to its own reverse circuit.
+
+    :param qc: Underlying QuantumCircuit.
+    :param edges: A list of 2-tuples of quantum registers and vertex colors corresponding to the colors of the two
+     vertices bordering that edge.
+    :param ancillas: Ancillary qubits to use.
+    :param target: If |0> beforehand, this qubit will be |1> if both edges are valid.
+    """
+    if len(edges) != 3:
+        raise ValueError(f"Need 3 edges, but got {len(edges)} instead.")
+    if len(ancillas) != 4:
+        raise ValueError(f"Need 4 ancillary qubits, but got {len(ancillas)} instead.")
+    # Compare the three edges and save their results in the three lowest ancillary qubits
+    for i, (v1, v2) in enumerate(edges):
+        _compare_external_edge(qc, v1, v2, ancillas[i])
+    # Combine the three qubits via an AND operation
+    add_and_3(qc, ancillas, ancillas[3], target)
     # Reverse the two edge comparisons to make the ancillary qubits |0> again. Note that the internal edge comparisons
     # all commute, so we don't need to reverse the order.
     for i, (v1, v2) in enumerate(edges):

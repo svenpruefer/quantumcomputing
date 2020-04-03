@@ -43,11 +43,23 @@ def add_or(qc: QuantumCircuit, first: Qubit, second: Qubit, target: Qubit) -> No
     qc.ccx(first, second, target)
 
 
+def add_and_3(qc: QuantumCircuit, qubits: List[Qubit], ancilla: Qubit, target: Qubit) -> None:
+    """
+    Combine three qubits via an AND operation using one ancilla qubit and saving the result into the `target` qubit.
+
+    :param qc: Underlying QuantumCircuit.
+    :param qubits: Qubits to combine via an AND operation.
+    :param ancilla: List of 2 ancillary qubits to use for temporary results.
+    :param target: If |0> beforehand, this qubit will be set to AND of the other qubits.
+    """
+    if len(qubits) != 3:
+        raise ValueError(f"Expected list of 3 qubits, but got {len(qubits)}.")
+    qc.mct(q_controls=qubits, q_target=target, q_ancilla=ancilla, mode='basic')
+
+
 def add_and_4(qc: QuantumCircuit, qubits: List[Qubit], ancillas: List[Qubit], target: Qubit) -> None:
     """
     Combine four qubits via an AND operation using two ancilla qubits and saving the result into the `target` qubit.
-
-    Note: This is worse than the built-in Multi-Toffoli gate, so prefer that.
 
     :param qc: Underlying QuantumCircuit.
     :param qubits: Qubits to combine via an AND operation.
