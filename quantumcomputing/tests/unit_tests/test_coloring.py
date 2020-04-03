@@ -9,7 +9,8 @@ from pytest import approx
 from qiskit import *
 from qiskit.providers import *
 
-from quantumcomputing.circuits.coloring import _compare_internal_edge
+from costs.costs import calc_total_costs
+from quantumcomputing.circuits.coloring import _compare_internal_edge, _compare_external_edge, VertexColor
 
 
 class TestFullAdder:
@@ -70,3 +71,32 @@ class TestFullAdder:
                                               '1 11 01': 0.0625,
                                               '1 11 10': 0.0625}
         assert result == approx(expected_results, abs=config['absolute_error'])
+        assert calc_total_costs(qc) - 4 == 129
+
+    def test_compare_external_edge_YELLOW(self, simulator, config) -> None:
+        # Given
+        vertex = QuantumRegister(2, 'vertex')
+        target = QuantumRegister(1, 'target')
+        vertex_measure = ClassicalRegister(2, 'vertex-measure')
+        target_measure = ClassicalRegister(1, 'target-measure')
+        qc = QuantumCircuit(vertex, target, vertex_measure, target_measure, name="test-circuit")
+
+        # Mix states and measure to obtain random test cases
+        qc.h(vertex)
+        qc.measure(vertex, vertex_measure)
+        # Compare edges
+        _compare_external_edge(qc, vertex, VertexColor.YELLOW, target[0])
+        # Measure result
+        qc.measure(target, target_measure)
+
+        # When
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job.result().get_counts(qc).items()}
+
+        # Then
+        # Expected Results are strings 'first second target'
+        expected_results: Dict[str, float] = {'0 10': 0.25, '1 00': 0.25, '1 01': 0.25, '1 11': 0.25}
+        assert result == approx(expected_results, abs=config['absolute_error'])
+        assert calc_total_costs(qc) - 2 == 72
