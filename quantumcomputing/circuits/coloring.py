@@ -235,3 +235,32 @@ def _compare_4_external_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegis
     # all commute, so we don't need to reverse the order.
     for i, (v1, v2) in enumerate(edges):
         _compare_external_edge(qc, v1, v2, ancillas[i])
+
+
+def add_4_coloring_oracle(qc, vertices: Dict[str, QuantumRegister], internal_edges: Set[Tuple[str, str]],
+                          external_edges: Set[Tuple[str, VertexColor]], auxiliary: QuantumRegister,
+                          target: QuantumRegister, ancilla: Qubit) -> None:
+    """
+    Add a 4-color Grover oracle to a quantum circuit.
+
+    Note that the input is assumed to be feasible. TODO Write down what feasibility entails exactly.
+
+    :param qc: Underlying QuantumCircuit.
+    :param vertices: Vertices with corresponding quantum registers modeling their colors.
+    :param internal_edges: Internal edges.
+    :param external_edges: External edges.
+    :param auxiliary: Quantum register for auxiliary qubits used for temporary manipulations. Must be |0> initially.
+    :param target: Quantum register to save the correctness of edges temporarilly. Must be |0> initially.
+    :param ancilla: Ancillary qubit used to flip the phase of correct solutions.
+    """
+    # Group internal edges into groups of four and save their states in the target register.
+
+    # Group external edges into groups of four and save their states in the remaining part of the target register.
+
+    # Combine target register using Multi-Toffoli gate with target the ancilla qubit to flip the phase of
+    # searched states.
+    qc.mct(q_controls=target, q_target=ancilla, ancilla=auxiliary, mode='basic')
+    # Reverse external edges
+
+    # Reverse internal edges
+    pass
