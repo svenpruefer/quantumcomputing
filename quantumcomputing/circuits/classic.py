@@ -47,6 +47,26 @@ def add_and_4(qc: QuantumCircuit, qubits: List[Qubit], ancillas: List[Qubit], ta
     """
     Combine four qubits via an AND operation using two ancilla qubits and saving the result into the `target` qubit.
 
+    Note: This is worse than the built-in Multi-Toffoli gate, so prefer that.
+
+    :param qc: Underlying QuantumCircuit.
+    :param qubits: Qubits to combine via an AND operation.
+    :param ancillas: List of 2 ancillary qubits to use for temporary results.
+    :param target: If |0> beforehand, this qubit will be set to AND of the other qubits.
+    """
+    if len(qubits) != 4:
+        raise ValueError(f"Expected list of 4 qubits, but got {len(qubits)}.")
+    if len(ancillas) != 2:
+        raise ValueError(f"Expected list of 2 ancilla qubits, but got {len(ancillas)}.")
+    qc.mct(q_controls=qubits, q_target=target, q_ancilla=ancillas, mode='basic')
+
+
+def _add_and_4(qc: QuantumCircuit, qubits: List[Qubit], ancillas: List[Qubit], target: Qubit) -> None:
+    """
+    Combine four qubits via an AND operation using two ancilla qubits and saving the result into the `target` qubit.
+
+    Note: This is worse than the built-in Multi-Toffoli gate, so prefer that.
+
     :param qc: Underlying QuantumCircuit.
     :param qubits: Qubits to combine via an AND operation.
     :param ancillas: List of 2 ancillary qubits to use for temporary results.

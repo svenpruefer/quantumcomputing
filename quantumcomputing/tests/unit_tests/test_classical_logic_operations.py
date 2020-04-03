@@ -180,4 +180,4 @@ class TestClassicalLogicOperations:
                                               '0 1110': 0.0625,
                                               '1 1111': 0.0625}
         assert result == approx(expected_results, abs=config['absolute_error'])
-        assert calc_total_costs(qc) - 4 == 345
+        assert calc_total_costs(qc) - 4 == 213
