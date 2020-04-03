@@ -4,13 +4,12 @@
 #
 # Copyright (c) 2020 by DLR.
 from enum import Enum
+from typing import List, Tuple
 
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit.circuit import Qubit
 
-from circuits.adder import add_full_adder_5, add_full_adder_5_reverse
-from circuits.classic import add_xor
-from circuits.grover import add_grover_reflection_with_ancilla
+from circuits.classic import add_and_4, add_and
 
 
 class VertexColor(Enum):
@@ -70,3 +69,57 @@ def _compare_external_edge(qc: QuantumCircuit, vertex: QuantumRegister, external
         qc.x(vertex[1])
     # Negate result such that 1 corresponds to correct condition
     qc.x(target)
+
+
+def _compare_4_internal_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegister, QuantumRegister]],
+                              ancillas: List[Qubit], target: Qubit) -> None:
+    """
+    Compare colors of four internal vertices using six ancillary qubits and save the result into another qubit.
+
+    Note that this circuit is equal to its own reverse circuit.
+
+    :param qc: Underlying QuantumCircuit.
+    :param edges: A list of 2-tuples of quantum registers corresponding to the colors of the two vertices bordering that edge.
+    :param ancillas: Ancillary qubits to use.
+    :param target: If |0> beforehand, this qubit will be |1> if all four edges are valid.
+    """
+    if len(edges) != 4:
+        raise ValueError(f"Need 4 edges, but got {len(edges)} instead.")
+    if len(ancillas) != 6:
+        raise ValueError(f"Need 6 ancillary qubits, but got {len(ancillas)} instead.")
+    # Compare the four edges and save their results in the 4 lowest ancillary qubits
+    for i, (v1, v2) in enumerate(edges):
+        _compare_internal_edge(qc, v1, v2, ancillas[i])
+    # Combine the four qubits via an AND operation
+    add_and_4(qc, ancillas[0:4], ancillas[4:6], target)
+    # Reverse the four edge comparisons to make the ancillary qubits |0> again. Note that the internal edge comparisons
+    # all commute, so we don't need to reverse the order.
+    for i, (v1, v2) in enumerate(edges):
+        _compare_internal_edge(qc, v1, v2, ancillas[i])
+
+
+def _compare_2_internal_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegister, QuantumRegister]],
+                              ancillas: List[Qubit], target: Qubit) -> None:
+    """
+    Compare colors of two internal vertices using two ancillary qubits and save the result into another qubit.
+
+    Note that this circuit is equal to its own reverse circuit.
+
+    :param qc: Underlying QuantumCircuit.
+    :param edges: A list of 2-tuples of quantum registers corresponding to the colors of the two vertices bordering that edge.
+    :param ancillas: Ancillary qubits to use.
+    :param target: If |0> beforehand, this qubit will be |1> if both edges are valid.
+    """
+    if len(edges) != 2:
+        raise ValueError(f"Need 2 edges, but got {len(edges)} instead.")
+    if len(ancillas) != 2:
+        raise ValueError(f"Need 2 ancillary qubits, but got {len(ancillas)} instead.")
+    # Compare the two edges and save their results in the two lowest ancillary qubits
+    for i, (v1, v2) in enumerate(edges):
+        _compare_internal_edge(qc, v1, v2, ancillas[i])
+    # Combine the four qubits via an AND operation
+    add_and(qc, ancillas[0], ancillas[1], target)
+    # Reverse the two edge comparisons to make the ancillary qubits |0> again. Note that the internal edge comparisons
+    # all commute, so we don't need to reverse the order.
+    for i, (v1, v2) in enumerate(edges):
+        _compare_internal_edge(qc, v1, v2, ancillas[i])
