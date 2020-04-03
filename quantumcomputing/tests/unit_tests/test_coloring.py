@@ -9,8 +9,9 @@ from pytest import approx
 from qiskit import *
 from qiskit.providers import *
 
+from circuits.coloring import _compare_internal_edge, VertexColor, _compare_external_edge, _compare_4_internal_edges, \
+    _compare_2_internal_edges
 from costs.costs import calc_total_costs
-from quantumcomputing.circuits.coloring import *
 
 
 class TestColoringCircuits:
