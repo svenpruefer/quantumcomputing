@@ -13,10 +13,10 @@ from circuits.classic import add_and_4, add_and
 
 
 class VertexColor(Enum):
-    RED = 0
-    BLUE = 1
-    YELLOW = 2
-    GREEN = 3
+    RED = 0  # 00
+    BLUE = 1  # 01
+    YELLOW = 2  # 10
+    GREEN = 3  # 11
 
 
 def _compare_internal_edge(qc: QuantumCircuit, first: QuantumRegister, second: QuantumRegister, target: Qubit) -> None:

@@ -10,7 +10,7 @@ from qiskit import *
 from qiskit.providers import *
 
 from circuits.coloring import _compare_internal_edge, VertexColor, _compare_external_edge, _compare_4_internal_edges, \
-    _compare_2_internal_edges
+    _compare_2_internal_edges, _compare_4_external_edges, _compare_2_external_edges
 from costs.costs import calc_total_costs
 
 
@@ -515,3 +515,171 @@ class TestColoringCircuits:
                                               '11 11 11 11 0': 0.0039}
         assert result == approx(expected_results, abs=config['absolute_error'])
         assert calc_total_costs(qc) - 8 == 585
+
+    def test_compare_4_external_edges(self, simulator, config) -> None:
+        # Given
+        edges: List[Tuple[QuantumRegister, VertexColor]] = [
+            (QuantumRegister(2, "v1"), VertexColor.YELLOW),  # 10
+            (QuantumRegister(2, "v2"), VertexColor.RED),  # 00
+            (QuantumRegister(2, "v3"), VertexColor.GREEN),  # 11
+            (QuantumRegister(2, "v1"), VertexColor.BLUE)  # 01
+        ]
+        ancilla = QuantumRegister(6, 'ancilla')
+        target = QuantumRegister(1, 'target')
+        target_measure = ClassicalRegister(1, 'target-measure')
+        input_measure: List[ClassicalRegister] = [
+            ClassicalRegister(2, 'v1-measure'),
+            ClassicalRegister(2, 'v2-measure'),
+            ClassicalRegister(2, 'v3-measure')
+        ]
+        qc = QuantumCircuit(target, ancilla, target_measure, name="test-circuit")
+        for v1, v2 in edges[0:3]:
+            qc.add_register(v1)
+        for c in input_measure:
+            qc.add_register(c)
+
+        # Mix the three independent states and measure to obtain random test cases
+        for (v1, v2), c in zip(edges[0:3], input_measure):
+            qc.h(v1)
+            qc.measure(v1, c)
+        # Compare edges
+        _compare_4_external_edges(qc, edges, list(ancilla), target[0])
+        # Measure result
+        qc.measure(target, target_measure)
+
+        # When
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job.result().get_counts(qc).items()}
+
+        # Then
+        # Expected Results are strings 'v3 v2 v1 target'
+        # To interpret the expected results, notice that
+        # v1 is next to 10 AND 01 vertex
+        # v2 is next to a 00 vertex
+        # v3 is next to a 11 vertex
+        expected_results: Dict[str, float] = {'00 00 00 0': 0.0156,
+                                              '00 00 01 0': 0.0156,
+                                              '00 00 10 0': 0.0156,
+                                              '00 00 11 0': 0.0156,
+                                              '00 01 00 1': 0.0156,
+                                              '00 01 01 0': 0.0156,
+                                              '00 01 10 0': 0.0156,
+                                              '00 01 11 1': 0.0156,
+                                              '00 10 00 1': 0.0156,
+                                              '00 10 01 0': 0.0156,
+                                              '00 10 10 0': 0.0156,
+                                              '00 10 11 1': 0.0156,
+                                              '00 11 00 1': 0.0156,
+                                              '00 11 01 0': 0.0156,
+                                              '00 11 10 0': 0.0156,
+                                              '00 11 11 1': 0.0156,
+                                              '01 00 00 0': 0.0156,
+                                              '01 00 01 0': 0.0156,
+                                              '01 00 10 0': 0.0156,
+                                              '01 00 11 0': 0.0156,
+                                              '01 01 00 1': 0.0156,
+                                              '01 01 01 0': 0.0156,
+                                              '01 01 10 0': 0.0156,
+                                              '01 01 11 1': 0.0156,
+                                              '01 10 00 1': 0.0156,
+                                              '01 10 01 0': 0.0156,
+                                              '01 10 10 0': 0.0156,
+                                              '01 10 11 1': 0.0156,
+                                              '01 11 00 1': 0.0156,
+                                              '01 11 01 0': 0.0156,
+                                              '01 11 10 0': 0.0156,
+                                              '01 11 11 1': 0.0156,
+                                              '10 00 00 0': 0.0156,
+                                              '10 00 01 0': 0.0156,
+                                              '10 00 10 0': 0.0156,
+                                              '10 00 11 0': 0.0156,
+                                              '10 01 00 1': 0.0156,
+                                              '10 01 01 0': 0.0156,
+                                              '10 01 10 0': 0.0156,
+                                              '10 01 11 1': 0.0156,
+                                              '10 10 00 1': 0.0156,
+                                              '10 10 01 0': 0.0156,
+                                              '10 10 10 0': 0.0156,
+                                              '10 10 11 1': 0.0156,
+                                              '10 11 00 1': 0.0156,
+                                              '10 11 01 0': 0.0156,
+                                              '10 11 10 0': 0.0156,
+                                              '10 11 11 1': 0.0156,
+                                              '11 00 00 0': 0.0156,
+                                              '11 00 01 0': 0.0156,
+                                              '11 00 10 0': 0.0156,
+                                              '11 00 11 0': 0.0156,
+                                              '11 01 00 0': 0.0156,
+                                              '11 01 01 0': 0.0156,
+                                              '11 01 10 0': 0.0156,
+                                              '11 01 11 0': 0.0156,
+                                              '11 10 00 0': 0.0156,
+                                              '11 10 01 0': 0.0156,
+                                              '11 10 10 0': 0.0156,
+                                              '11 10 11 0': 0.0156,
+                                              '11 11 00 0': 0.0156,
+                                              '11 11 01 0': 0.0156,
+                                              '11 11 10 0': 0.0156,
+                                              '11 11 11 0': 0.0156}
+        assert result == approx(expected_results, abs=config['absolute_error'])
+        assert calc_total_costs(qc) - 6 == 789
+
+    def test_compare_2_external_edges(self, simulator, config) -> None:
+        # Given
+        edges: List[Tuple[QuantumRegister, VertexColor]] = [
+            (QuantumRegister(2, "v1"), VertexColor.YELLOW),  # 10
+            (QuantumRegister(2, "v2"), VertexColor.GREEN)  # 11
+        ]
+        ancilla = QuantumRegister(2, 'ancilla')
+        target = QuantumRegister(1, 'target')
+        target_measure = ClassicalRegister(1, 'target-measure')
+        input_measure: List[ClassicalRegister] = [
+            ClassicalRegister(2, 'v1-measure'),
+            ClassicalRegister(2, 'v2-measure')
+        ]
+        qc = QuantumCircuit(target, ancilla, target_measure, name="test-circuit")
+        for v1, v2 in edges[0:2]:
+            qc.add_register(v1)
+        for c in input_measure:
+            qc.add_register(c)
+
+        # Mix the two states and measure to obtain random test cases
+        for (v1, v2), c in zip(edges[0:2], input_measure):
+            qc.h(v1)
+            qc.measure(v1, c)
+        # Compare edges
+        _compare_2_external_edges(qc, edges, list(ancilla), target[0])
+        # Measure result
+        qc.measure(target, target_measure)
+
+        # When
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job.result().get_counts(qc).items()}
+
+        # Then
+        # Expected Results are strings 'v2 v1 target'
+        # To interpret the expected results, notice that
+        # v2 is next to a 11 vertex
+        # v1 is next to a 10 vertex
+        expected_results: Dict[str, float] = {'00 00 1': 0.0625,
+                                              '00 01 1': 0.0625,
+                                              '00 10 0': 0.0625,
+                                              '00 11 1': 0.0625,
+                                              '01 00 1': 0.0625,
+                                              '01 01 1': 0.0625,
+                                              '01 10 0': 0.0625,
+                                              '01 11 1': 0.0625,
+                                              '10 00 1': 0.0625,
+                                              '10 01 1': 0.0625,
+                                              '10 10 0': 0.0625,
+                                              '10 11 1': 0.0625,
+                                              '11 00 0': 0.0625,
+                                              '11 01 0': 0.0625,
+                                              '11 10 0': 0.0625,
+                                              '11 11 0': 0.0625}
+        assert result == approx(expected_results, abs=config['absolute_error'])
+        assert calc_total_costs(qc) - 4 == 353
