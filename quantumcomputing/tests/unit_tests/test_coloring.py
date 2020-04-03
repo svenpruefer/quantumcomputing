@@ -73,7 +73,36 @@ class TestFullAdder:
         assert result == approx(expected_results, abs=config['absolute_error'])
         assert calc_total_costs(qc) - 4 == 129
 
-    def test_compare_external_edge_YELLOW(self, simulator, config) -> None:
+    def test_compare_internal_edge_self_reversibility(self, simulator, config) -> None:
+        # Given
+        first_vertex = QuantumRegister(2, 'first')
+        second_vertex = QuantumRegister(2, 'second')
+        target = QuantumRegister(1, 'target')
+        target_measure = ClassicalRegister(1, 'target-measure')
+        qc = QuantumCircuit(first_vertex, second_vertex, target,
+                            target_measure,
+                            name="test-circuit")
+
+        # Mix states and measure to obtain random test cases
+        qc.h(first_vertex)
+        qc.h(second_vertex)
+        # Compare edges
+        _compare_internal_edge(qc, first_vertex, second_vertex, target[0])
+        _compare_internal_edge(qc, first_vertex, second_vertex, target[0])
+        # Measure result
+        qc.measure(target, target_measure)
+
+        # When
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job.result().get_counts(qc).items()}
+
+        # Then
+        expected_results: Dict[str, float] = {'0': 1}
+        assert result == approx(expected_results, abs=config['absolute_error'])
+
+    def test_compare_external_edge_yellow(self, simulator, config) -> None:
         # Given
         vertex = QuantumRegister(2, 'vertex')
         target = QuantumRegister(1, 'target')
@@ -100,3 +129,28 @@ class TestFullAdder:
         expected_results: Dict[str, float] = {'0 10': 0.25, '1 00': 0.25, '1 01': 0.25, '1 11': 0.25}
         assert result == approx(expected_results, abs=config['absolute_error'])
         assert calc_total_costs(qc) - 2 == 72
+
+    def test_compare_external_edge_yellow_self_reversibility(self, simulator, config) -> None:
+        # Given
+        vertex = QuantumRegister(2, 'vertex')
+        target = QuantumRegister(1, 'target')
+        target_measure = ClassicalRegister(1, 'target-measure')
+        qc = QuantumCircuit(vertex, target, target_measure, name="test-circuit")
+
+        # Mix states and measure to obtain random test cases
+        qc.h(vertex)
+        # Compare edges
+        _compare_external_edge(qc, vertex, VertexColor.YELLOW, target[0])
+        _compare_external_edge(qc, vertex, VertexColor.YELLOW, target[0])
+        # Measure result
+        qc.measure(target, target_measure)
+
+        # When
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job.result().get_counts(qc).items()}
+
+        # Then
+        expected_results: Dict[str, float] = {'0': 1}
+        assert result == approx(expected_results, abs=config['absolute_error'])

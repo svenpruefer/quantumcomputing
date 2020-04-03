@@ -24,6 +24,8 @@ def _compare_internal_edge(qc: QuantumCircuit, first: QuantumRegister, second: Q
     """
     Compare colors of two neighboring vertices along an edge and save the result into another qubit.
 
+    Note that this circuit is equal to its own reverse circuit.
+
     :param qc: Underlying QuantumCircuit.
     :param first: First quantum register with two qubits encoding a vertex color to compare with `second`.
     :param second: Second quantum register with two qubits encoding a vertex color to compare with `first`.
@@ -42,9 +44,12 @@ def _compare_internal_edge(qc: QuantumCircuit, first: QuantumRegister, second: Q
     qc.cx(first[0], second[0])
 
 
-def _compare_external_edge(qc: QuantumCircuit, vertex: QuantumRegister, external_vertex_color: VertexColor, target: Qubit) -> None:
+def _compare_external_edge(qc: QuantumCircuit, vertex: QuantumRegister, external_vertex_color: VertexColor,
+                           target: Qubit) -> None:
     """
     Compare colors of an internal vertex with an externally specified color and save the result into another qubit.
+
+    Note that this circuit is equal to its own reverse circuit.
 
     :param qc: Underlying QuantumCircuit.
     :param vertex: Quantum register with two qubits encoding a vertex color to compare with `external_vertex_color`
