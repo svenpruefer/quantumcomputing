@@ -29,5 +29,9 @@ def calc_total_costs(qc: QuantumCircuit) -> int:
     :return: The total cost of `qc`.
     """
     counts = _calc_u3_cx_gates(qc)
-    total = counts['u3'] + 10 * counts['cx']
+    total = 0
+    if 'u3' in counts.keys():
+        total = total + counts['u3']
+    if 'cx' in counts.keys():
+        total = total + 10 * counts['cx']
     return total
