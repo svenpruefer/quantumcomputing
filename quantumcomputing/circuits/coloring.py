@@ -10,7 +10,7 @@ from more_itertools import grouper
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit.circuit import Qubit
 
-from circuits.classic import add_and_4, add_and, add_and_3
+from quantumcomputing.circuits.classic import add_and_4, add_and, add_and_3
 
 
 class VertexColor(Enum):
@@ -253,6 +253,7 @@ def add_4_coloring_oracle(qc, vertices: Dict[str, QuantumRegister], internal_edg
     :param target: Quantum register to save the correctness of edges temporarilly. Must be |0> initially.
     :param ancilla: Ancillary qubit used to flip the phase of correct solutions.
     """
+    grouped_internal_edges = list(grouper(internal_edges, 4))
     # Group internal edges into groups of four and save their states in the target register.
 
     # Group external edges into groups of four and save their states in the remaining part of the target register.

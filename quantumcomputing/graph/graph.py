@@ -6,7 +6,7 @@
 
 from typing import Set, Dict, Tuple
 
-from circuits.coloring import VertexColor
+from quantumcomputing.circuits.coloring import VertexColor
 
 
 class Graph:

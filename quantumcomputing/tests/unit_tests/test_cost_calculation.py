@@ -4,15 +4,11 @@
 #
 # Copyright (c) 2020 by DLR.
 
-from typing import *
-
-import pytest
-from pytest import approx
 from qiskit import *
-from qiskit.providers import *
 
-from costs.costs import calc_total_costs
 from quantumcomputing.circuits.grover import add_grover_without_ancilla_1_0, add_grover_with_ancilla_1_0
+from quantumcomputing.costs.costs import calc_total_costs
+
 
 class TestCostCalculation:
 

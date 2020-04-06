@@ -7,9 +7,9 @@
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit.circuit import Qubit
 
-from circuits.adder import add_full_adder_5, add_full_adder_5_reverse
-from circuits.classic import add_xor
-from circuits.grover import add_grover_reflection_with_ancilla
+from quantumcomputing.circuits.adder import add_full_adder_5, add_full_adder_5_reverse
+from quantumcomputing.circuits.classic import add_xor
+from quantumcomputing.circuits.grover import add_grover_reflection_with_ancilla
 
 
 def add_max_cut_circuit(qc: QuantumCircuit, vertices: QuantumRegister, edges: QuantumRegister,

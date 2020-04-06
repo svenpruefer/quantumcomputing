@@ -11,7 +11,7 @@ from pytest import approx
 from qiskit import *
 from qiskit.providers import *
 
-from costs.costs import calc_total_costs
+from quantumcomputing.costs.costs import calc_total_costs
 from quantumcomputing.circuits.max_cut import add_max_cut_circuit
 
 

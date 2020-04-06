@@ -10,7 +10,7 @@ import pytest
 from qiskit import *
 from qiskit.providers import *
 
-from circuits.grover import add_grover_reflection_no_ancilla, add_grover_reflection_with_ancilla
+from quantumcomputing.circuits.grover import add_grover_reflection_no_ancilla, add_grover_reflection_with_ancilla
 
 
 class TestGroverReflection:
