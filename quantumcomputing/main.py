@@ -5,7 +5,7 @@ def main():
     """
     Main entry point for quantumcomputing.
     """
-    pass
+    raise NotImplementedError("Running this library as a standalone application is not supported yet.")
 
 
 if __name__ == "__main__":
