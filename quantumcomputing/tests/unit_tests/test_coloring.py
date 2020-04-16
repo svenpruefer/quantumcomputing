@@ -707,54 +707,21 @@ class TestColoringCircuits:
                 ('5', '6')
             },
             given_colors={
-                '0' : VertexColor.RED,
-                '4' : VertexColor.GREEN,
-                '5' : VertexColor.YELLOW,
-                '3' : VertexColor.BLUE
+                '0': VertexColor.RED,
+                '4': VertexColor.GREEN,
+                '5': VertexColor.YELLOW,
+                '3': VertexColor.BLUE
             }
         )
 
-        qc: QuantumCircuit = graph.get_4_color_grover_circuit(4)
-
-        ancilla_register = next(x for x in qc.qregs if x.name == "ancilla")
-        ancilla_measure = ClassicalRegister(1, "ancilla-measure")
-        qc.add_register(ancilla_measure)
-        qc.measure(ancilla_register, ancilla_measure)
-
-        # Measure some qubits
-        vertex_1_register = next(x for x in qc.qregs if x.name == "v-1")
-        vertex_1_measure = ClassicalRegister(2, "v-1-measure")
-        qc.add_register(vertex_1_measure)
-        qc.measure(vertex_1_register, vertex_1_measure)
-
-        vertex_2_register = next(x for x in qc.qregs if x.name == "v-2")
-        vertex_2_measure = ClassicalRegister(2, "v-2-measure")
-        qc.add_register(vertex_2_measure)
-        qc.measure(vertex_2_register, vertex_2_measure)
-
-        vertex_6_register = next(x for x in qc.qregs if x.name == "v-6")
-        vertex_6_measure = ClassicalRegister(2, "v-6-measure")
-        qc.add_register(vertex_6_measure)
-        qc.measure(vertex_6_register, vertex_6_measure)
-
         # When
-        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
-        # Calculate relative results
-        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
-                                    job.result().get_counts(qc).items()}
-
-        probable_results = {k: v for k, v in result.items() if v > 0.008}
+        result: List[Dict[str, VertexColor]] = graph.run_4_color_grover_algorithm(simulator, config['test_runs'], 4)
 
         # Then
-        # Expected Results are strings 'v6 v2 v1 ancilla'
-        # To interpret the expected results, notice that
-        # RED = 00
-        # BLUE = 01
-        # YELLOW = 10
-        # GREEN = 11
-        expected_results: Dict[str, float] = {'00 11 01 0': 0.25,
-                                              '11 00 01 0': 0.25,
-                                              '00 11 01 1': 0.25,
-                                              '11 00 01 1': 0.25}
-        assert probable_results == approx(expected_results, abs=config['absolute_error'])
-        assert calc_total_costs(qc) == 17392
+        expected_result: List[Dict[str, VertexColor]] = [
+            {'1': VertexColor.BLUE, '2': VertexColor.GREEN, '6': VertexColor.RED},
+            {'1': VertexColor.BLUE, '2': VertexColor.RED, '6': VertexColor.GREEN}
+        ]
+        assert len(result) == len(expected_result)
+        for x in expected_result:
+            assert x in result
