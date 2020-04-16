@@ -253,15 +253,86 @@ def add_4_coloring_oracle(qc, vertices: Dict[str, QuantumRegister], internal_edg
     :param target: Quantum register to save the correctness of edges temporarilly. Must be |0> initially.
     :param ancilla: Ancillary qubit used to flip the phase of correct solutions.
     """
-    grouped_internal_edges = list(grouper(internal_edges, 4))
-    # Group internal edges into groups of four and save their states in the target register.
+    # Calculate numbers of grouped edges and group internal edges into groups of four (and one with zero to three)
+    number_4_groups_internal_edges = len(internal_edges) // 4
+    number_4_groups_external_edges = len(external_edges) // 4
+
+    list_internal_edges: List[Tuple[str, str]] = list(internal_edges)
+    list_external_edges: List[Tuple[str, VertexColor]] = list(external_edges)
+
+    groups_internal_edges: List[List[Tuple[str, str]]] = list(
+        map(list, grouper(list_internal_edges[:number_4_groups_internal_edges * 4], 4))
+    ) + [list_internal_edges[number_4_groups_internal_edges * 4:]]
+    groups_external_edges: List[List[Tuple[str, VertexColor]]] = list(
+        map(list, grouper(list_external_edges[:number_4_groups_external_edges * 4], 4))
+    ) + [list_external_edges[number_4_groups_external_edges * 4:]]
+
+    if len(groups_internal_edges) + len(groups_external_edges) > len(list(target)):
+        raise ValueError(f"Need {len(groups_internal_edges) + len(groups_external_edges)} qubits in 'target' register"
+                         f"to save results of edge comparisons, but got only {len(list(target))}")
+
+    # Compare groups of edges
+    for i, group in enumerate(groups_internal_edges):
+        qubit_group_internal: List[Tuple[QuantumRegister, QuantumRegister]] = [(vertices[v1], vertices[v2]) for v1, v2
+                                                                               in group]
+        qc.barrier(auxiliary)
+        if len(qubit_group_internal) == 4:
+            _compare_4_internal_edges(qc, qubit_group_internal, list(auxiliary), target[i])
+        if len(qubit_group_internal) == 3:
+            _compare_3_internal_edges(qc, qubit_group_internal, list(auxiliary), target[i])
+        if len(qubit_group_internal) == 2:
+            _compare_2_internal_edges(qc, qubit_group_internal, list(auxiliary), target[i])
+        if len(qubit_group_internal) == 1:
+            _compare_internal_edge(qc, qubit_group_internal[0][0], qubit_group_internal[0][1], target[i])
 
     # Group external edges into groups of four and save their states in the remaining part of the target register.
+    for i, external_group in enumerate(groups_external_edges):
+        qubit_group_external: List[Tuple[QuantumRegister, VertexColor]] = [(vertices[v1], v2) for v1, v2 in
+                                                                           external_group]
+        qc.barrier(auxiliary)
+        if len(qubit_group_external) == 4:
+            _compare_4_external_edges(qc, qubit_group_external, list(auxiliary), target[i + len(groups_internal_edges)])
+        if len(qubit_group_external) == 3:
+            _compare_3_external_edges(qc, qubit_group_external, list(auxiliary), target[i + len(groups_internal_edges)])
+        if len(qubit_group_external) == 2:
+            _compare_2_external_edges(qc, qubit_group_external, list(auxiliary), target[i + len(groups_internal_edges)])
+        if len(qubit_group_external) == 1:
+            _compare_external_edge(qc, qubit_group_external[0][0], qubit_group_external[0][1], target[i + len(groups_internal_edges)])
 
     # Combine target register using Multi-Toffoli gate with target the ancilla qubit to flip the phase of
     # searched states.
-    qc.mct(q_controls=target, q_target=ancilla, ancilla=auxiliary, mode='basic')
-    # Reverse external edges
+    qc.mct(q_controls=target, q_target=ancilla, q_ancilla=auxiliary, mode='basic')
+
+    # Reverse external edges by adding identical gates. As only the target gates are modified
+    # via a Multi-Toffoli gate we don't need to reverse the order of the comparisons)
+    for i, external_group in enumerate(groups_external_edges):
+        qubit_group_external: List[Tuple[QuantumRegister, VertexColor]] = [(vertices[v1], v2) for v1, v2 in
+                                                                           external_group]
+        qc.barrier(auxiliary)
+        if len(qubit_group_external) == 4:
+            _compare_4_external_edges(qc, qubit_group_external, list(auxiliary), target[i + len(groups_internal_edges)])
+        if len(qubit_group_external) == 3:
+            _compare_3_external_edges(qc, qubit_group_external, list(auxiliary), target[i + len(groups_internal_edges)])
+        if len(qubit_group_external) == 2:
+            _compare_2_external_edges(qc, qubit_group_external, list(auxiliary), target[i + len(groups_internal_edges)])
+        if len(qubit_group_external) == 1:
+            _compare_external_edge(qc, qubit_group_external[0][0], qubit_group_external[0][1], target[i + len(groups_internal_edges)])
+
+    # Reverse internal edges by adding identical gates. As only the target gates are modified
+    # via a Multi-Toffoli gate we don't need to reverse the order of the comparisons)
+    for i, group in enumerate(groups_internal_edges):
+        qubit_group_internal: List[Tuple[QuantumRegister, QuantumRegister]] = [(vertices[v1], vertices[v2]) for v1, v2
+                                                                               in group]
+        qc.barrier(auxiliary)
+        if len(qubit_group_internal) == 4:
+            _compare_4_internal_edges(qc, qubit_group_internal, list(auxiliary), target[i])
+        if len(qubit_group_internal) == 3:
+            _compare_3_internal_edges(qc, qubit_group_internal, list(auxiliary), target[i])
+        if len(qubit_group_internal) == 2:
+            _compare_2_internal_edges(qc, qubit_group_internal, list(auxiliary), target[i])
+        if len(qubit_group_internal) == 1:
+            _compare_internal_edge(qc, qubit_group_internal[0][0], qubit_group_internal[0][1], target[i])
+
 
     # Reverse internal edges
     pass
