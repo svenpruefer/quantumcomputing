@@ -11,7 +11,6 @@ from pytest import approx
 from qiskit import *
 from qiskit.providers import *
 from quantumcomputing.circuits.grover import add_grover_without_ancilla_1_0, add_grover_with_ancilla_1_0
-import matplotlib.pyplot as plt
 
 
 class TestGrover:
@@ -57,8 +56,6 @@ class TestGrover:
 
         # Then
         expected_results: Dict[str, float] = {'10': 1}
-        qc.draw()
-        plt.show()
         assert result == approx(expected_results, rel=config['relative_error'])
 
     def test_grover_with_ancilla_on_1_0(self, simulator, config):
