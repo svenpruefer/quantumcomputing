@@ -86,8 +86,8 @@ def _compare_4_internal_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegis
     """
     if len(edges) != 4:
         raise ValueError(f"Need 4 edges, but got {len(edges)} instead.")
-    if len(ancillas) != 6:
-        raise ValueError(f"Need 6 ancillary qubits, but got {len(ancillas)} instead.")
+    if len(ancillas) < 6:
+        raise ValueError(f"Need at least 6 ancillary qubits, but got {len(ancillas)} instead.")
     # Compare the four edges and save their results in the 4 lowest ancillary qubits
     for i, (v1, v2) in enumerate(edges):
         _compare_internal_edge(qc, v1, v2, ancillas[i])
@@ -102,7 +102,7 @@ def _compare_4_internal_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegis
 def _compare_3_internal_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegister, QuantumRegister]],
                               ancillas: List[Qubit], target: Qubit) -> None:
     """
-    Compare colors of three internal vertices using four ancillary qubits and save the result into another qubit.
+    Compare colors of three internal vertices using at least four ancillary qubits and save the result into another qubit.
 
     Note that this circuit is equal to its own reverse circuit.
 
@@ -113,8 +113,8 @@ def _compare_3_internal_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegis
     """
     if len(edges) != 3:
         raise ValueError(f"Need 3 edges, but got {len(edges)} instead.")
-    if len(ancillas) != 4:
-        raise ValueError(f"Need 4 ancillary qubits, but got {len(ancillas)} instead.")
+    if len(ancillas) < 4:
+        raise ValueError(f"Need at least 4 ancillary qubits, but got {len(ancillas)} instead.")
     # Compare the three edges and save their results in the 3 lowest ancillary qubits
     for i, (v1, v2) in enumerate(edges):
         _compare_internal_edge(qc, v1, v2, ancillas[i])
@@ -129,7 +129,7 @@ def _compare_3_internal_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegis
 def _compare_2_internal_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegister, QuantumRegister]],
                               ancillas: List[Qubit], target: Qubit) -> None:
     """
-    Compare correctness of two internal edges using two ancillary qubits and save the result into another qubit.
+    Compare correctness of two internal edges using at least two ancillary qubits and save the result into another qubit.
 
     Note that this circuit is equal to its own reverse circuit.
 
@@ -140,8 +140,8 @@ def _compare_2_internal_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegis
     """
     if len(edges) != 2:
         raise ValueError(f"Need 2 edges, but got {len(edges)} instead.")
-    if len(ancillas) != 2:
-        raise ValueError(f"Need 2 ancillary qubits, but got {len(ancillas)} instead.")
+    if len(ancillas) < 2:
+        raise ValueError(f"Need at least 2 ancillary qubits, but got {len(ancillas)} instead.")
     # Compare the two edges and save their results in the two lowest ancillary qubits
     for i, (v1, v2) in enumerate(edges):
         _compare_internal_edge(qc, v1, v2, ancillas[i])
@@ -156,7 +156,7 @@ def _compare_2_internal_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegis
 def _compare_2_external_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegister, VertexColor]],
                               ancillas: List[Qubit], target: Qubit) -> None:
     """
-    Compare correctness of two external edges using two ancillary qubits and save the result into another qubit.
+    Compare correctness of two external edges using at least two ancillary qubits and save the result into another qubit.
 
     Note that this circuit is equal to its own reverse circuit.
 
@@ -168,8 +168,8 @@ def _compare_2_external_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegis
     """
     if len(edges) != 2:
         raise ValueError(f"Need 2 edges, but got {len(edges)} instead.")
-    if len(ancillas) != 2:
-        raise ValueError(f"Need 2 ancillary qubits, but got {len(ancillas)} instead.")
+    if len(ancillas) < 2:
+        raise ValueError(f"Need at least 2 ancillary qubits, but got {len(ancillas)} instead.")
     # Compare the two edges and save their results in the two lowest ancillary qubits
     for i, (v1, v2) in enumerate(edges):
         _compare_external_edge(qc, v1, v2, ancillas[i])
@@ -184,7 +184,7 @@ def _compare_2_external_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegis
 def _compare_3_external_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegister, VertexColor]],
                               ancillas: List[Qubit], target: Qubit) -> None:
     """
-    Compare correctness of three external edges using four ancillary qubits and save the result into another qubit.
+    Compare correctness of three external edges using at least four ancillary qubits and save the result into another qubit.
 
     Note that this circuit is equal to its own reverse circuit.
 
@@ -196,13 +196,13 @@ def _compare_3_external_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegis
     """
     if len(edges) != 3:
         raise ValueError(f"Need 3 edges, but got {len(edges)} instead.")
-    if len(ancillas) != 4:
-        raise ValueError(f"Need 4 ancillary qubits, but got {len(ancillas)} instead.")
+    if len(ancillas) < 4:
+        raise ValueError(f"Need at least 4 ancillary qubits, but got {len(ancillas)} instead.")
     # Compare the three edges and save their results in the three lowest ancillary qubits
     for i, (v1, v2) in enumerate(edges):
         _compare_external_edge(qc, v1, v2, ancillas[i])
     # Combine the three qubits via an AND operation
-    add_and_3(qc, ancillas, ancillas[3], target)
+    add_and_3(qc, ancillas[0:3], ancillas[3], target)
     # Reverse the two edge comparisons to make the ancillary qubits |0> again. Note that the internal edge comparisons
     # all commute, so we don't need to reverse the order.
     for i, (v1, v2) in enumerate(edges):
@@ -212,7 +212,7 @@ def _compare_3_external_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegis
 def _compare_4_external_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegister, VertexColor]],
                               ancillas: List[Qubit], target: Qubit) -> None:
     """
-    Compare edges of four external vertices using six ancillary qubits and save the result into another qubit.
+    Compare edges of four external vertices using at least six ancillary qubits and save the result into another qubit.
 
     Note that this circuit is equal to its own reverse circuit.
 
@@ -224,8 +224,8 @@ def _compare_4_external_edges(qc: QuantumCircuit, edges: List[Tuple[QuantumRegis
     """
     if len(edges) != 4:
         raise ValueError(f"Need 4 edges, but got {len(edges)} instead.")
-    if len(ancillas) != 6:
-        raise ValueError(f"Need 6 ancillary qubits, but got {len(ancillas)} instead.")
+    if len(ancillas) < 6:
+        raise ValueError(f"Need at least 6 ancillary qubits, but got {len(ancillas)} instead.")
     # Compare the four edges and save their results in the 4 lowest ancillary qubits
     for i, (v1, v2) in enumerate(edges):
         _compare_external_edge(qc, v1, v2, ancillas[i])
