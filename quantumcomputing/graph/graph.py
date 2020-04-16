@@ -4,11 +4,12 @@
 #
 # Copyright (c) 2020 by DLR.
 
-from typing import Set, Dict, Tuple
+from typing import Set, Dict, Tuple, List
 
-from qiskit import QuantumCircuit, QuantumRegister
+from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, execute
+from qiskit.providers import BaseBackend, BaseJob
 
-from quantumcomputing.circuits.coloring import VertexColor, add_4_coloring_grover
+from quantumcomputing.circuits.coloring import VertexColor, add_4_coloring_grover, get_color_from_binary_string
 
 
 class Graph:
@@ -19,6 +20,9 @@ class Graph:
     _internal_edges: Set[Tuple[str, str]] = set()
     _external_edges: Set[Tuple[str, str]] = set()
     _colors: Dict[str, VertexColor] = {}
+
+    _vertex_registers: Dict[str, QuantumRegister] = {}
+    _ancilla_register: QuantumRegister = None
 
     def __init__(self, vertices: Set[str], edges: Set[Tuple[str, str]],
                  given_colors: Dict[str, VertexColor]):
@@ -78,9 +82,11 @@ class Graph:
         # Create quantum registers for vertices
         vertices: Dict[str, QuantumRegister] = {name: QuantumRegister(2, f"v-{name}") for name in
                                                 self._internal_vertices}
+        self._vertex_registers = vertices
 
         # Create quantum register for ancilla qubit
         ancilla: QuantumRegister = QuantumRegister(1, "ancilla")
+        self._ancilla_register = ancilla
 
         # Determine colors for external edges
         external_edges: Set[Tuple[str, VertexColor]] = set()
@@ -141,3 +147,49 @@ class Graph:
                               repetitions)
 
         return qc
+
+    def run_4_color_grover_algorithm(self,
+                                     backend: BaseBackend,
+                                     runs: int,
+                                     repetitions: int = 5) -> List[Dict[str, VertexColor]]:
+        """
+        Run a 4-color Grover algorithm for the graph and obtain observed results.
+
+        :param backend: Backend to run the circuit on.
+        :param runs: Number of times the simulation gets run.
+        :param repetitions: Number of repetitions of Grover oracle and Grover reflection
+        :return: A set of solutions, where each solution specifies the color of an internal vertex
+        """
+        # Create the quantum circuit
+        qc: QuantumCircuit = self.get_4_color_grover_circuit(repetitions)
+
+        # Add classical registers and measure values
+        measure_ancilla: ClassicalRegister = ClassicalRegister(1, name="ancilla-measure")
+        measure_registers: Dict[str, ClassicalRegister] = {vertex: ClassicalRegister(2, name=f"v-{vertex}-measure") for
+                                                           vertex in self._internal_vertices}
+        qc.add_register(measure_ancilla)
+        qc.measure(self._ancilla_register, measure_ancilla)
+        list_internal_vertices = list(self._internal_vertices)
+        number_internal_vertices = len(list_internal_vertices)
+        for vertex in list_internal_vertices:
+            qc.add_register(measure_registers[vertex])
+            qc.measure(self._vertex_registers[vertex], measure_registers[vertex])
+
+        # Execute algorithm
+        job: BaseJob = execute(qc, backend, shots=runs)
+        job_result: Dict[str, float] = {key: value / runs for key, value in
+                                    job.result().get_counts(qc).items()}
+        filtered_result: Set[str] = {binary_result for binary_result, relative_count in job_result.items() if
+                                             relative_count > 1 / (2 * (4 ** number_internal_vertices))}
+
+        # Translate to colors
+        result: List[Dict[str, VertexColor]] = []
+        for solution_string in filtered_result:
+            solution: Dict[str, VertexColor] = {}
+            for i, binary in enumerate(solution_string.split(' ')[0:number_internal_vertices]):
+                solution[list_internal_vertices[number_internal_vertices-i-1]] = get_color_from_binary_string(binary)
+            if solution not in result:
+                result.append(solution)
+
+        return result
+
