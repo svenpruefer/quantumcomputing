@@ -3,7 +3,7 @@
 # This file is part of quantumcomputing.
 #
 # Copyright (c) 2020 by DLR.
-from typing import List
+from typing import List, Set
 
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit.circuit import Qubit
@@ -170,8 +170,8 @@ def add_grover_reflection_with_ancilla(qc: QuantumCircuit, register: QuantumRegi
     :param register: QuantumRegister containing the qubits whose amplitudes shall be amplified.
     :param ancillas: List of ancilla qubits to use.
     """
-    if len(ancillas) < len(list(register)) -3:
-        raise ValueError(f"Need {len(list(register)) -3} many ancilla qubits but got {len(ancillas)}")
+    if len(ancillas) < len(list(register)) - 3:
+        raise ValueError(f"Need {len(list(register)) - 3} many ancilla qubits but got {len(ancillas)}")
     qc.h(register)
     qc.x(register)
     qc.h(register[0])
@@ -179,3 +179,31 @@ def add_grover_reflection_with_ancilla(qc: QuantumCircuit, register: QuantumRegi
     qc.h(register[0])
     qc.x(register)
     qc.h(register)
+
+
+def add_grover_reflection_with_ancilla_on_registers(qc: QuantumCircuit, registers: Set[QuantumRegister],
+                                       ancillas: Set[Qubit]) -> None:
+    """
+    Add a Grover reflection (or amplitude amplification) acting on all qubits in a set of QuantumRegisters
+    in a QuantumCircuit using ancilla qubits.
+
+    Notice that you need `#{qubits in all registers} - 3` ancilla qubits. This is because this implementation uses a
+    Multi-Toffoli-Gate with one target qubit and the basic qiskit implementation needs `#{control qubits} - 2`
+    ancillary qubits.
+
+    :param qc: Underlying QuantumCircuit.
+    :param registers: Set of QuantumRegister containing the qubits whose amplitudes shall be amplified.
+    :param ancillas: Set of ancilla qubits to use.
+    """
+    qubits: List[Qubit] = [qubit for register in registers for qubit in list(register)]
+    if len(ancillas) < len(qubits) - 3:
+        raise ValueError(f"Need {len(qubits) - 3} many ancilla qubits but got {len(ancillas)}")
+    for qubit in qubits:
+        qc.h(qubit)
+        qc.x(qubit)
+    qc.h(qubits[0])
+    qc.mct(q_controls=qubits[1:], q_target=qubits[0], q_ancilla=list(ancillas))
+    qc.h(qubits[0])
+    for qubit in qubits:
+        qc.x(qubit)
+        qc.h(qubit)
