@@ -8,10 +8,13 @@ import pytest
 from pytest import approx
 from qiskit import *
 from qiskit.providers import *
+import matplotlib.pyplot as plt
 
-from quantumcomputing.circuits.coloring import _compare_internal_edge, VertexColor, _compare_external_edge, _compare_4_internal_edges, \
+from quantumcomputing.circuits.coloring import _compare_internal_edge, VertexColor, _compare_external_edge, \
+    _compare_4_internal_edges, \
     _compare_2_internal_edges, _compare_4_external_edges, _compare_2_external_edges
 from quantumcomputing.costs.costs import calc_total_costs
+from quantumcomputing.graph.graph import Graph
 
 
 class TestColoringCircuits:
@@ -23,6 +26,7 @@ class TestColoringCircuits:
     @pytest.fixture
     def config(self) -> Dict[str, Any]:
         return {'test_runs': 10000,
+                'test_runs_slow': 10000,
                 'absolute_error': 0.01}
 
     @pytest.fixture
@@ -683,3 +687,74 @@ class TestColoringCircuits:
                                               '11 11 0': 0.0625}
         assert result == approx(expected_results, abs=config['absolute_error'])
         assert calc_total_costs(qc) - 4 == 353
+
+    def test_small_graph_4_coloring(self, simulator, config) -> None:
+        # Given
+        graph = Graph(
+            vertices={'0', '1', '2', '3', '4', '5', '6'},
+            edges={
+                ('0', '1'),
+                ('0', '4'),
+                ('0', '5'),
+                ('1', '2'),
+                ('1', '4'),
+                ('1', '5'),
+                ('2', '3'),
+                ('2', '5'),
+                ('2', '6'),
+                ('3', '6'),
+                ('4', '5'),
+                ('5', '6')
+            },
+            given_colors={
+                '0' : VertexColor.RED,
+                '4' : VertexColor.GREEN,
+                '5' : VertexColor.YELLOW,
+                '3' : VertexColor.BLUE
+            }
+        )
+
+        qc: QuantumCircuit = graph.get_4_color_grover_circuit(4)
+
+        ancilla_register = next(x for x in qc.qregs if x.name == "ancilla")
+        ancilla_measure = ClassicalRegister(1, "ancilla-measure")
+        qc.add_register(ancilla_measure)
+        qc.measure(ancilla_register, ancilla_measure)
+
+        # Measure some qubits
+        vertex_1_register = next(x for x in qc.qregs if x.name == "v-1")
+        vertex_1_measure = ClassicalRegister(2, "v-1-measure")
+        qc.add_register(vertex_1_measure)
+        qc.measure(vertex_1_register, vertex_1_measure)
+
+        vertex_2_register = next(x for x in qc.qregs if x.name == "v-2")
+        vertex_2_measure = ClassicalRegister(2, "v-2-measure")
+        qc.add_register(vertex_2_measure)
+        qc.measure(vertex_2_register, vertex_2_measure)
+
+        vertex_6_register = next(x for x in qc.qregs if x.name == "v-6")
+        vertex_6_measure = ClassicalRegister(2, "v-6-measure")
+        qc.add_register(vertex_6_measure)
+        qc.measure(vertex_6_register, vertex_6_measure)
+
+        # When
+        job: BaseJob = execute(qc, simulator, shots=config['test_runs'])
+        # Calculate relative results
+        result: Dict[str, float] = {key: value / config['test_runs'] for key, value in
+                                    job.result().get_counts(qc).items()}
+
+        probable_results = {k: v for k, v in result.items() if v > 0.008}
+
+        # Then
+        # Expected Results are strings 'v6 v2 v1 ancilla'
+        # To interpret the expected results, notice that
+        # RED = 00
+        # BLUE = 01
+        # YELLOW = 10
+        # GREEN = 11
+        expected_results: Dict[str, float] = {'00 11 01 0': 0.25,
+                                              '11 00 01 0': 0.25,
+                                              '00 11 01 1': 0.25,
+                                              '11 00 01 1': 0.25}
+        assert probable_results == approx(expected_results, abs=config['absolute_error'])
+        assert calc_total_costs(qc) == 17392
