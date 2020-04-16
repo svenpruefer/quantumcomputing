@@ -21,6 +21,19 @@ class VertexColor(Enum):
     GREEN = 3  # 11
 
 
+def get_color_from_binary_string(input: str) -> VertexColor:
+    if input == "00":
+        return VertexColor.RED
+    elif input == "01":
+        return VertexColor.BLUE
+    elif input == "10":
+        return VertexColor.YELLOW
+    elif input == "11":
+        return VertexColor.GREEN
+    else:
+        raise ValueError(f"Cannot interpret binary string {input} as color")
+
+
 def _compare_internal_edge(qc: QuantumCircuit, first: QuantumRegister, second: QuantumRegister, target: Qubit) -> None:
     """
     Compare colors of two neighboring vertices along an edge and save the result into another qubit.
