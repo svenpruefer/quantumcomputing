@@ -10,6 +10,7 @@ from more_itertools import grouper
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit.circuit import Qubit
 
+from circuits.grover import add_grover_reflection_with_ancilla_on_registers
 from quantumcomputing.circuits.classic import add_and_4, add_and, add_and_3
 
 
@@ -334,5 +335,31 @@ def add_4_coloring_oracle(qc, vertices: Dict[str, QuantumRegister], internal_edg
             _compare_internal_edge(qc, qubit_group_internal[0][0], qubit_group_internal[0][1], target[i])
 
 
-    # Reverse internal edges
-    pass
+def add_4_coloring_grover(qc, vertices: Dict[str, QuantumRegister], internal_edges: Set[Tuple[str, str]],
+                          external_edges: Set[Tuple[str, VertexColor]], auxiliary: QuantumRegister,
+                          target: QuantumRegister, ancilla: Qubit, repetitions: int) -> None:
+    """
+    Add a 4-color Grover algorithm circuit to a quantum circuit.
+
+    Note that the input is assumed to be feasible. TODO Write down what feasibility entails exactly.
+
+    :param qc: Underlying QuantumCircuit.
+    :param vertices: Vertices with corresponding quantum registers modeling their colors.
+    :param internal_edges: Internal edges.
+    :param external_edges: External edges.
+    :param auxiliary: Quantum register for auxiliary qubits used for temporary manipulations. Must be |0> initially.
+    :param target: Quantum register to save the correctness of edges temporarily. Must be |0> initially.
+    :param ancilla: Ancillary qubit used to flip the phase of correct solutions.
+    """
+    # Mix vertex states
+    for vertex, register in vertices.items():
+        qc.h(register)
+
+    # Flip phase of ancilla qubit
+    qc.x(ancilla)
+    qc.h(ancilla)
+
+    # Repeat Grover algorithm
+    for i in range(0, repetitions):
+        add_4_coloring_oracle(qc, vertices, internal_edges, external_edges, auxiliary, target, ancilla)
+        add_grover_reflection_with_ancilla_on_registers(qc, set(vertices.values()), set(list(auxiliary) + list(target)))
