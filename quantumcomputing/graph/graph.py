@@ -4,7 +4,7 @@
 #
 # Copyright (c) 2020 by DLR.
 
-from typing import Set, Dict, Tuple, List
+from typing import Set, Dict, Tuple, List, Optional
 
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, execute
 from qiskit.providers import BaseBackend, BaseJob
@@ -13,16 +13,6 @@ from quantumcomputing.circuits.coloring import VertexColor, add_4_coloring_grove
 
 
 class Graph:
-    _vertices: List[str] = set()
-    _internal_vertices: List[str] = []
-    _external_vertices: Set[str] = set()
-    _edges: Set[Tuple[str, str]] = set()
-    _internal_edges: Set[Tuple[str, str]] = set()
-    _external_edges: Set[Tuple[str, str]] = set()
-    _colors: Dict[str, VertexColor] = {}
-
-    _vertex_registers: Dict[str, QuantumRegister] = {}
-    _ancilla_register: QuantumRegister = None
 
     def __init__(self, vertices: List[str], edges: Set[Tuple[str, str]],
                  given_colors: Dict[str, VertexColor]):
@@ -43,15 +33,24 @@ class Graph:
         for vertex in given_colors.keys():
             if vertex not in vertices:
                 raise ValueError(f"Vertex {vertex} with a specified color is not contained in the set of vertices.")
-        # Separate vertices
+        # Instance variables
         self._vertices = vertices
+        self._external_vertices = set()
+        self._internal_vertices = []
+        self._edges = edges
+        self._external_edges = set()
+        self._internal_edges = set()
+        self._colors = {}
+        self._vertex_registers: Dict[str, QuantumRegister] = {}
+        self._ancilla_register: Optional[QuantumRegister] = None
+
+        # Separate vertices
         for vertex in vertices:
             if vertex in given_colors.keys():
                 self._external_vertices.add(vertex)
             else:
                 self._internal_vertices.append(vertex)
         # Separate edges
-        self._edges = edges
         for edge in edges:
             if edge[0] in given_colors.keys() and edge[1] in given_colors.keys():
                 if given_colors[edge[0]] == given_colors[edge[1]]:
@@ -203,7 +202,7 @@ class Graph:
         total_runs: int = sum(result.values())
         number_internal_vertices: int = len(self._internal_vertices)
         filtered_result: Set[str] = {binary_result for binary_result, absolute_count in result.items() if
-                                     absolute_count > total_runs / (2 * (4 ** number_internal_vertices))}
+                                     absolute_count > total_runs / (4 ** number_internal_vertices)}
         return filtered_result
 
     def translate_result_to_dict(self, filtered_result: Set[str]) -> List[Dict[str, VertexColor]]:
