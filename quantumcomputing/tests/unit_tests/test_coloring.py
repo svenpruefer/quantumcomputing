@@ -8,7 +8,6 @@ import pytest
 from pytest import approx
 from qiskit import *
 from qiskit.providers import *
-import matplotlib.pyplot as plt
 
 from quantumcomputing.circuits.coloring import _compare_internal_edge, VertexColor, _compare_external_edge, \
     _compare_4_internal_edges, \
@@ -691,7 +690,7 @@ class TestColoringCircuits:
     def test_small_graph_4_coloring(self, simulator, config) -> None:
         # Given
         graph = Graph(
-            vertices={'0', '1', '2', '3', '4', '5', '6'},
+            vertices=['0', '1', '2', '3', '4', '5', '6'],
             edges={
                 ('0', '1'),
                 ('0', '4'),
@@ -715,7 +714,10 @@ class TestColoringCircuits:
         )
 
         # When
-        result: List[Dict[str, VertexColor]] = graph.run_4_color_grover_algorithm(simulator, config['test_runs'], 4)
+        result: List[Dict[str, VertexColor]] = graph.run_4_cover_grover_algorithm_and_interpret_results(
+            simulator,
+            config['test_runs'],
+            3)
 
         # Then
         expected_result: List[Dict[str, VertexColor]] = [
@@ -725,3 +727,93 @@ class TestColoringCircuits:
         assert len(result) == len(expected_result)
         for x in expected_result:
             assert x in result
+
+    def test_medium_graph_4_coloring(self, simulator, config) -> None:
+        # Given
+        graph = Graph(
+            vertices=['0', '1', '2', '3', '4', '5', '6'],
+            edges={
+                ('0', '1'),
+                ('0', '4'),
+                ('0', '5'),
+                ('1', '2'),
+                ('1', '4'),
+                ('1', '5'),
+                ('2', '3'),
+                ('2', '5'),
+                ('2', '6'),
+                ('3', '6'),
+                ('4', '5'),
+                ('5', '6')
+            },
+            given_colors={
+                '0': VertexColor.RED,
+                '4': VertexColor.GREEN,
+                '3': VertexColor.BLUE
+            }
+        )
+
+        # When
+        result: List[Dict[str, VertexColor]] = graph.run_4_cover_grover_algorithm_and_interpret_results(
+            simulator,
+            config['test_runs'],
+            3)
+
+        # Then
+        expected_result: List[Dict[str, VertexColor]] = [
+            {'1': VertexColor.BLUE, '2': VertexColor.GREEN, '5': VertexColor.YELLOW, '6': VertexColor.RED},
+            {'1': VertexColor.BLUE, '2': VertexColor.RED, '5': VertexColor.YELLOW, '6': VertexColor.GREEN},
+            {'1': VertexColor.YELLOW, '2': VertexColor.RED, '5': VertexColor.BLUE, '6': VertexColor.GREEN},
+            {'1': VertexColor.YELLOW, '2': VertexColor.RED, '5': VertexColor.BLUE, '6': VertexColor.YELLOW},
+            {'1': VertexColor.YELLOW, '2': VertexColor.GREEN, '5': VertexColor.BLUE, '6': VertexColor.RED},
+            {'1': VertexColor.YELLOW, '2': VertexColor.GREEN, '5': VertexColor.BLUE, '6': VertexColor.YELLOW}
+        ]
+        assert len(result) == len(expected_result)
+        for x in expected_result:
+            assert x in result
+
+    def large_graph_4_coloring(self, simulator, config) -> None:
+        """
+        DO NOT RUN THIS TEST ON A LOCAL SIMULATOR.
+
+        On SP's machine this takes about 11 minutes for a single (!) run.
+        """
+        # Given
+        graph = Graph(
+            vertices=['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+            edges={
+                ('0', '1'),
+                ('0', '4'),
+                ('0', '5'),
+                ('1', '2'),
+                ('1', '4'),
+                ('1', '5'),
+                ('2', '3'),
+                ('2', '5'),
+                ('2', '6'),
+                ('3', '6'),
+                ('4', '5'),
+                ('4', '7'),
+                ('4', '8'),
+                ('4', '9'),
+                ('5', '6'),
+                ('5', '8'),
+                ('5', '9'),
+                ('6', '9'),
+                ('7', '10'),
+                ('8', '9'),
+                ('8', '10'),
+                ('9', '10')
+            },
+            given_colors={
+                '0': VertexColor.RED,
+                '3': VertexColor.BLUE,
+                '7': VertexColor.YELLOW,
+                '10': VertexColor.GREEN
+            }
+        )
+
+        # When
+        result: Dict[str, int] = graph.run_4_color_grover_algorithm(simulator, 1, 5)
+
+        print(result)
