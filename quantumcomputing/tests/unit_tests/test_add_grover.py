@@ -22,7 +22,7 @@ class TestGrover:
     @pytest.fixture
     def config(self) -> Dict[str, Any]:
         return {'test_runs': 1000,
-                'relative_error': 0.05}
+                'absolute_error': 0.05}
 
     def test_grover_without_ancilla_on_1_0(self, simulator, config):
         """
@@ -56,7 +56,7 @@ class TestGrover:
 
         # Then
         expected_results: Dict[str, float] = {'10': 1}
-        assert result == approx(expected_results, rel=config['relative_error'])
+        assert result == approx(expected_results, abs=config['absolute_error'])
 
     def test_grover_with_ancilla_on_1_0(self, simulator, config):
         input = QuantumRegister(2, "input")
@@ -79,4 +79,4 @@ class TestGrover:
 
         # Then
         expected_results: Dict[str, float] = {'0 10': 0.5, '1 10': 0.5}
-        assert result == approx(expected_results, rel=config['relative_error'])
+        assert result == approx(expected_results, abs=config['absolute_error'])
