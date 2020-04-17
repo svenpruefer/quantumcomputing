@@ -3,4 +3,8 @@
 
 # Python
 venv/
+quantumcomputing.egg-info/
 *.pyc
+
+# Result file
+/*.qasm
