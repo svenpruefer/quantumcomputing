@@ -31,7 +31,7 @@ class TestColoringCircuits:
     @pytest.fixture
     def config_slow(self) -> Dict[str, Any]:
         return {'test_runs': 100,
-                'absolute_error': 0.1}
+                'absolute_error': 0.2}
 
     @staticmethod
     def set_color(qc: QuantumCircuit, vertex: QuantumRegister, color: VertexColor) -> None:
