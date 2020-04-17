@@ -13,8 +13,8 @@ from quantumcomputing.circuits.coloring import VertexColor, add_4_coloring_grove
 
 
 class Graph:
-    _vertices: Set[str] = set()
-    _internal_vertices: Set[str] = set()
+    _vertices: List[str] = set()
+    _internal_vertices: List[str] = []
     _external_vertices: Set[str] = set()
     _edges: Set[Tuple[str, str]] = set()
     _internal_edges: Set[Tuple[str, str]] = set()
@@ -24,7 +24,7 @@ class Graph:
     _vertex_registers: Dict[str, QuantumRegister] = {}
     _ancilla_register: QuantumRegister = None
 
-    def __init__(self, vertices: Set[str], edges: Set[Tuple[str, str]],
+    def __init__(self, vertices: List[str], edges: Set[Tuple[str, str]],
                  given_colors: Dict[str, VertexColor]):
         """
         Constructor for graphs for which we want to solve the four-color problem using a quantum computer.
@@ -49,7 +49,7 @@ class Graph:
             if vertex in given_colors.keys():
                 self._external_vertices.add(vertex)
             else:
-                self._internal_vertices.add(vertex)
+                self._internal_vertices.append(vertex)
         # Separate edges
         self._edges = edges
         for edge in edges:
@@ -80,12 +80,12 @@ class Graph:
         :return: Quantum Circuit with 4-color Grover circuit
         """
         # Create quantum registers for vertices
-        vertices: Dict[str, QuantumRegister] = {name: QuantumRegister(2, f"v-{name}") for name in
+        vertices: Dict[str, QuantumRegister] = {name: QuantumRegister(2, name=f"v_{name}") for name in
                                                 self._internal_vertices}
         self._vertex_registers = vertices
 
         # Create quantum register for ancilla qubit
-        ancilla: QuantumRegister = QuantumRegister(1, "ancilla")
+        ancilla: QuantumRegister = QuantumRegister(1, name="ancilla")
         self._ancilla_register = ancilla
 
         # Determine colors for external edges
@@ -106,7 +106,7 @@ class Graph:
             total_number_target_qubits += 1
         if external_remainder > 0:
             total_number_target_qubits += 1
-        target: QuantumRegister = QuantumRegister(total_number_target_qubits, "target")
+        target: QuantumRegister = QuantumRegister(total_number_target_qubits, name="target")
 
         # Determine how many auxiliary qubits are needed and create suitable quantum register
         # The number of auxiliary qubits needed is the maximum number of necessary ancilla qubits
@@ -127,10 +127,10 @@ class Graph:
                                             total_number_target_qubits - 2,
                                             2 * len(vertices) - 3 - total_number_target_qubits
                                             )
-        auxiliary: QuantumRegister = QuantumRegister(total_number_auxiliary_qubits, "auxiliary")
+        auxiliary: QuantumRegister = QuantumRegister(total_number_auxiliary_qubits, name="auxiliary")
 
         # Create QuantumCircuit including all quantum registers
-        qc: QuantumCircuit = QuantumCircuit(name="four-color-grover-circuit")
+        qc: QuantumCircuit = QuantumCircuit(name="four_color_grover_circuit")
         for register in vertices.values():
             qc.add_register(register)
         qc.add_register(auxiliary)
@@ -148,48 +148,93 @@ class Graph:
 
         return qc
 
+    def get_4_color_grover_algorithm_with_measurements(self, repetitions: int = 5) -> QuantumCircuit:
+        qc = self.get_4_color_grover_circuit(repetitions)
+        self.add_measurements(qc)
+        return qc
+
     def run_4_color_grover_algorithm(self,
                                      backend: BaseBackend,
                                      runs: int,
-                                     repetitions: int = 5) -> List[Dict[str, VertexColor]]:
+                                     repetitions: int = 5) -> Dict[str, int]:
         """
         Run a 4-color Grover algorithm for the graph and obtain observed results.
 
         :param backend: Backend to run the circuit on.
         :param runs: Number of times the simulation gets run.
         :param repetitions: Number of repetitions of Grover oracle and Grover reflection
-        :return: A set of solutions, where each solution specifies the color of an internal vertex
+        :return: A set of solutions, where each solution specifies the color of all internal vertices
         """
         # Create the quantum circuit
         qc: QuantumCircuit = self.get_4_color_grover_circuit(repetitions)
 
         # Add classical registers and measure values
-        measure_ancilla: ClassicalRegister = ClassicalRegister(1, name="ancilla-measure")
-        measure_registers: Dict[str, ClassicalRegister] = {vertex: ClassicalRegister(2, name=f"v-{vertex}-measure") for
-                                                           vertex in self._internal_vertices}
-        qc.add_register(measure_ancilla)
-        qc.measure(self._ancilla_register, measure_ancilla)
-        list_internal_vertices = list(self._internal_vertices)
-        number_internal_vertices = len(list_internal_vertices)
-        for vertex in list_internal_vertices:
-            qc.add_register(measure_registers[vertex])
-            qc.measure(self._vertex_registers[vertex], measure_registers[vertex])
+        self.add_measurements(qc)
 
         # Execute algorithm
         job: BaseJob = execute(qc, backend, shots=runs)
-        job_result: Dict[str, float] = {key: value / runs for key, value in
-                                    job.result().get_counts(qc).items()}
-        filtered_result: Set[str] = {binary_result for binary_result, relative_count in job_result.items() if
-                                             relative_count > 1 / (2 * (4 ** number_internal_vertices))}
+        job_result = job.result()
 
-        # Translate to colors
+        return job_result.get_counts(qc)
+
+    def add_measurements(self, qc: QuantumCircuit) -> None:
+        measure_registers: Dict[str, ClassicalRegister] = {vertex: ClassicalRegister(2, name=f"v_{vertex}_measure") for
+                                                           vertex in self._internal_vertices}
+        for vertex in self._internal_vertices:
+            qc.add_register(measure_registers[vertex])
+            qc.measure(self._vertex_registers[vertex], measure_registers[vertex])
+
+    def run_4_cover_grover_algorithm_and_interpret_results(self,
+                                                           backend: BaseBackend,
+                                                           runs: int,
+                                                           repetitions: int = 5) -> List[Dict[str, VertexColor]]:
+        """
+        Run a 4-color Grover algorithm for the graph and obtain filtered and interpreted results.
+
+        :param backend: Backend to run the circuit on.
+        :param runs: Number of times the simulation gets run.
+        :param repetitions: Number of repetitions of Grover oracle and Grover reflection
+        :return: A set of solutions, where each solution specifies the color of all internal vertices
+        """
+        results: Dict[str, int] = self.run_4_color_grover_algorithm(backend, runs, repetitions)
+        return self.translate_result_to_dict(self.filter_result(results))
+
+    def filter_result(self, result: Dict[str, int]) -> Set[str]:
+        total_runs: int = sum(result.values())
+        number_internal_vertices: int = len(self._internal_vertices)
+        filtered_result: Set[str] = {binary_result for binary_result, absolute_count in result.items() if
+                                     absolute_count > total_runs / (2 * (4 ** number_internal_vertices))}
+        return filtered_result
+
+    def translate_result_to_dict(self, filtered_result: Set[str]) -> List[Dict[str, VertexColor]]:
+        number_internal_vertices: int = len(self._internal_vertices)
         result: List[Dict[str, VertexColor]] = []
         for solution_string in filtered_result:
             solution: Dict[str, VertexColor] = {}
-            for i, binary in enumerate(solution_string.split(' ')[0:number_internal_vertices]):
-                solution[list_internal_vertices[number_internal_vertices-i-1]] = get_color_from_binary_string(binary)
+            for i, binary in enumerate(solution_string.split(' ')):
+                solution[self._internal_vertices[number_internal_vertices - i - 1]] = get_color_from_binary_string(
+                    binary)
             if solution not in result:
                 result.append(solution)
-
         return result
 
+    def translate_result_to_string(self, filtered_result: Set[str]) -> Set[str]:
+        """
+        Translate results to readable strings of integers.
+
+        THIS NEEDS ALL VERTEX NAMES TO BE INTEGERS.
+
+        :param filtered_result:
+        :return:
+        """
+        results_as_dict: List[Dict[str, VertexColor]] = self.translate_result_to_dict(filtered_result)
+        result: Set[str] = set()
+        for result_dict in results_as_dict:
+            all_colors: Dict[str, VertexColor] = {**self._colors, **result_dict}
+            result_dict_with_integers: Dict[int, int] = {int(vertex): color.value for vertex, color in
+                                                         all_colors.items()}
+            temp_result = ""
+            for k, v in sorted(result_dict_with_integers, key=lambda x: x[0]):
+                temp_result + str(v)
+            result.add(temp_result)
+        return result

@@ -10,7 +10,7 @@ from more_itertools import grouper
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit.circuit import Qubit
 
-from circuits.grover import add_grover_reflection_with_ancilla_on_registers
+from quantumcomputing.circuits.grover import add_grover_reflection_with_ancilla_on_registers
 from quantumcomputing.circuits.classic import add_and_4, add_and, add_and_3
 
 
@@ -276,10 +276,14 @@ def add_4_coloring_oracle(qc, vertices: Dict[str, QuantumRegister], internal_edg
 
     groups_internal_edges: List[List[Tuple[str, str]]] = list(
         map(list, grouper(list_internal_edges[:number_4_groups_internal_edges * 4], 4))
-    ) + [list_internal_edges[number_4_groups_internal_edges * 4:]]
+    )
+    if len(list_internal_edges[number_4_groups_internal_edges * 4:]) > 0:
+        groups_internal_edges.append(list_internal_edges[number_4_groups_internal_edges * 4:])
     groups_external_edges: List[List[Tuple[str, VertexColor]]] = list(
         map(list, grouper(list_external_edges[:number_4_groups_external_edges * 4], 4))
-    ) + [list_external_edges[number_4_groups_external_edges * 4:]]
+    )
+    if len(list_external_edges[number_4_groups_external_edges * 4:]) > 0:
+        groups_external_edges.append(list_external_edges[number_4_groups_external_edges * 4:])
 
     if len(groups_internal_edges) + len(groups_external_edges) > len(list(target)):
         raise ValueError(f"Need {len(groups_internal_edges) + len(groups_external_edges)} qubits in 'target' register"
