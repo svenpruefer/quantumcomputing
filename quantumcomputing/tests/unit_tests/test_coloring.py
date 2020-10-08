@@ -171,7 +171,12 @@ class TestColoringCircuits:
         expected_results: Dict[str, float] = {'0': 1}
         assert result == approx(expected_results, abs=config['absolute_error'])
 
-    def test_compare_4_internal_edges(self, simulator, config_slow) -> None:
+    def compare_4_internal_edges(self, simulator, config_slow) -> None:
+        """
+        ONLY RUN THIS TEST ON A LOCAL SIMULATOR IF YOU HAVE SOME TIME.
+
+        On SP's machine this takes about 2 minutes in total.
+        """
         # Given
         edges = [(QuantumRegister(2, f"v_{i}0"), (QuantumRegister(2, f"v_{i}1"))) for i in range(0, 4)]
         ancilla = QuantumRegister(6, 'ancilla')
