@@ -20,7 +20,7 @@ class TestDoubleQubitControlledGates:
 
     @pytest.fixture
     def config(self) -> Dict[str, Any]:
-        return {'test_runs': 1000,
+        return {'test_runs': 2000,
                 'relative_error': 0.05}
 
     def test_bell_state(self, simulator: BaseBackend, config: Dict[str, Any]) -> None:
