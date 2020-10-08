@@ -1,5 +1,7 @@
 # Final Version
 
+This is the final result from the first Quantenhackathon from March 2020.
+
 ## Generalities
 
 Due to some weird Python problems on my machine I am not able to
