@@ -54,7 +54,7 @@ def add_and_3(qc: QuantumCircuit, qubits: List[Qubit], ancilla: Qubit, target: Q
     """
     if len(qubits) != 3:
         raise ValueError(f"Expected list of 3 qubits, but got {len(qubits)}.")
-    qc.mct(q_controls=qubits, q_target=target, q_ancilla=[ancilla], mode='basic')
+    qc.mct(control_qubits=qubits, target_qubit=target, ancilla_qubits=[ancilla], mode='basic')
 
 
 def add_and_4(qc: QuantumCircuit, qubits: List[Qubit], ancillas: List[Qubit], target: Qubit) -> None:
@@ -70,7 +70,7 @@ def add_and_4(qc: QuantumCircuit, qubits: List[Qubit], ancillas: List[Qubit], ta
         raise ValueError(f"Expected list of 4 qubits, but got {len(qubits)}.")
     if len(ancillas) != 2:
         raise ValueError(f"Expected list of 2 ancilla qubits, but got {len(ancillas)}.")
-    qc.mct(q_controls=qubits, q_target=target, q_ancilla=ancillas, mode='basic')
+    qc.mct(control_qubits=qubits, target_qubit=target, ancilla_qubits=ancillas, mode='basic')
 
 
 def _add_and_4(qc: QuantumCircuit, qubits: List[Qubit], ancillas: List[Qubit], target: Qubit) -> None:

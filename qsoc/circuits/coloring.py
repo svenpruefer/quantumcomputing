@@ -319,7 +319,7 @@ def add_4_coloring_oracle(qc, vertices: Dict[str, QuantumRegister], internal_edg
 
     # Combine target register using Multi-Toffoli gate with target the ancilla qubit to flip the phase of
     # searched states.
-    qc.mct(q_controls=target, q_target=ancilla, q_ancilla=auxiliary, mode='basic')
+    qc.mct(control_qubits=target, target_qubit=ancilla, ancilla_qubits=auxiliary, mode='basic')
 
     # Reverse external edges by adding identical gates. As only the target gates are modified
     # via a Multi-Toffoli gate we don't need to reverse the order of the comparisons)
