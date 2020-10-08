@@ -6,4 +6,4 @@ install:
   - pip install -r requirements.txt
 # command to run tests
 script:
-  - pytest quantumcomputing/tests/unit_tests/
+  - pytest qsoc/tests/unit_tests/

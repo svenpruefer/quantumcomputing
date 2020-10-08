@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# This file is part of quantumcomputing.
+# This file is part of qsoc.
 #
 # Copyright (c) 2020 by DLR.
 
@@ -11,8 +11,8 @@ from pytest import approx
 from qiskit import *
 from qiskit.providers import *
 
-from quantumcomputing.costs.costs import calc_total_costs
-from quantumcomputing.circuits.max_cut import add_max_cut_circuit
+from qsoc.costs.costs import calc_total_costs
+from qsoc.circuits.max_cut import add_max_cut_circuit
 
 
 class TestMaxCut:

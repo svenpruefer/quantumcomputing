@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# This file is part of quantumcomputing.
+# This file is part of qsoc.
 #
 # Copyright (c) 2020 by DLR.
 
@@ -10,7 +10,7 @@ import pytest
 from pytest import approx
 from qiskit import *
 from qiskit.providers import *
-from quantumcomputing.circuits.grover import add_grover_without_ancilla_1_0, add_grover_with_ancilla_1_0
+from qsoc.circuits.grover import add_grover_without_ancilla_1_0, add_grover_with_ancilla_1_0
 
 
 class TestGrover:

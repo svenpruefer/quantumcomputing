@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
-# This file is part of quantumcomputing.
+# This file is part of qsoc.
 #
 # Copyright (c) 2020 by DLR.
 
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit.circuit import Qubit
 
-from quantumcomputing.circuits.adder import add_full_adder_5, add_full_adder_5_reverse
-from quantumcomputing.circuits.classic import add_xor
-from quantumcomputing.circuits.grover import add_grover_reflection_with_ancilla
+from qsoc.circuits.adder import add_full_adder_5, add_full_adder_5_reverse
+from qsoc.circuits.classic import add_xor
+from qsoc.circuits.grover import add_grover_reflection_with_ancilla
 
 
 def add_max_cut_circuit(qc: QuantumCircuit, vertices: QuantumRegister, edges: QuantumRegister,

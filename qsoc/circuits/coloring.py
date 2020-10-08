@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# This file is part of quantumcomputing.
+# This file is part of qsoc.
 #
 # Copyright (c) 2020 by DLR.
 from enum import Enum
@@ -10,8 +10,8 @@ from more_itertools import grouper
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit.circuit import Qubit
 
-from quantumcomputing.circuits.grover import add_grover_reflection_with_ancilla_on_registers
-from quantumcomputing.circuits.classic import add_and_4, add_and, add_and_3
+from qsoc.circuits.grover import add_grover_reflection_with_ancilla_on_registers
+from qsoc.circuits.classic import add_and_4, add_and, add_and_3
 
 
 class VertexColor(Enum):

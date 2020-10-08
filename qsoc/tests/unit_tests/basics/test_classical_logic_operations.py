@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# This code ist part of quantumcomputation.
+# This code ist part of qsoc.
 #
 # Copyright (c) 2020 by DLR.
 
@@ -11,8 +11,8 @@ from pytest import approx
 from qiskit import *
 from qiskit.providers import *
 
-from quantumcomputing.costs.costs import calc_total_costs
-from quantumcomputing.circuits.classic import *
+from qsoc.costs.costs import calc_total_costs
+from qsoc.circuits.classic import *
 
 
 class TestClassicalLogicOperations:

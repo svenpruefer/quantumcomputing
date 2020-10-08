@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# This file is part of quantumcomputing.
+# This file is part of qsoc.
 #
 # Copyright (c) 2020 by DLR.
 
@@ -10,7 +10,7 @@ import pytest
 from pytest import approx
 from qiskit import *
 from qiskit.providers import *
-from quantumcomputing.circuits.adder import add_full_adder_7, add_full_adder_6, add_full_adder_5, add_half_adder
+from qsoc.circuits.adder import add_full_adder_7, add_full_adder_6, add_full_adder_5, add_half_adder
 
 
 class TestFullAdder:

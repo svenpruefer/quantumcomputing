@@ -47,7 +47,7 @@ venv aware of all modules.
 
 ### Execution
 
-* Run `python quantumcomputing/main.py` to get the file `grover-circuit-4-color.qasm`
+* Run `python qsoc/main.py` to get the file `grover-circuit-4-color.qasm`
   which contains the circuit. This file is already present at this
   location, so you don't need to do this step.
 * Run `python qasm.py -d remote -i grover-circuit-4-color.qasm -r 8000`

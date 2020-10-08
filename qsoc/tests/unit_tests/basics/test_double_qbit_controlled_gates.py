@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# This code ist part of quantumcomputation.
+# This code ist part of sqoc.
 #
 # Copyright (c) 2020 by DLR.
 

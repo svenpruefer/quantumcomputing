@@ -1,17 +1,17 @@
-# This file is part of quantumcomputing.
+# This file is part of qsoc.
 #
 # Copyright (c) 2020 by DLR.
 
 #from qiskit import IBMQ
 
 from costs.costs import calc_total_costs
-from quantumcomputing.circuits.coloring import VertexColor
-from quantumcomputing.graph.graph import Graph
+from qsoc.circuits.coloring import VertexColor
+from qsoc.graph.graph import Graph
 
 
 def main():
     """
-    Main entry point for quantumcomputing.
+    Main entry point for qsoc.
     """
     # Get Backend
     #IBMQ.load_account()

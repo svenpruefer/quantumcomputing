@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# This file is part of quantumcomputing.
+# This file is part of qsoc.
 #
 # Copyright (c) 2020 by DLR.
 
 from qiskit import *
 
-from quantumcomputing.circuits.grover import add_grover_without_ancilla_1_0, add_grover_with_ancilla_1_0
-from quantumcomputing.costs.costs import calc_total_costs
+from qsoc.circuits.grover import add_grover_without_ancilla_1_0, add_grover_with_ancilla_1_0
+from qsoc.costs.costs import calc_total_costs
 
 
 class TestCostCalculation:

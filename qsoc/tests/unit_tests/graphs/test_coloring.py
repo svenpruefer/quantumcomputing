@@ -1,4 +1,4 @@
-# This file is part of quantumcomputing.
+# This file is part of qsoc.
 #
 # Copyright (c) 2020 by DLR.
 
@@ -9,11 +9,11 @@ from pytest import approx
 from qiskit import *
 from qiskit.providers import *
 
-from quantumcomputing.circuits.coloring import _compare_internal_edge, VertexColor, _compare_external_edge, \
+from qsoc.circuits.coloring import _compare_internal_edge, VertexColor, _compare_external_edge, \
     _compare_4_internal_edges, \
     _compare_2_internal_edges, _compare_4_external_edges, _compare_2_external_edges
-from quantumcomputing.costs.costs import calc_total_costs
-from quantumcomputing.graph.graph import Graph
+from qsoc.costs.costs import calc_total_costs
+from qsoc.graph.graph import Graph
 
 
 class TestColoringCircuits:

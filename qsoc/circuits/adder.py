@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-# This file is part of quantumcomputing.
+# This file is part of qsoc.
 #
 # Copyright (c) 2020 by DLR.
 
 from qiskit import QuantumCircuit
 from qiskit.circuit import Qubit
-from quantumcomputing.circuits.classic import (add_xor, add_and)
+from qsoc.circuits.classic import (add_xor, add_and)
 
 
 def add_half_adder(qc: QuantumCircuit, a: Qubit, b: Qubit, sum: Qubit, carry: Qubit) -> None:

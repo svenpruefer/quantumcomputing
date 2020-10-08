@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# This file is part of quantumcomputing.
+# This file is part of qsoc.
 #
 # Copyright (c) 2020 by DLR.
 
@@ -9,7 +9,7 @@ from typing import Set, Dict, Tuple, List, Optional
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, execute
 from qiskit.providers import BaseBackend, BaseJob
 
-from quantumcomputing.circuits.coloring import VertexColor, add_4_coloring_grover, get_color_from_binary_string
+from qsoc.circuits.coloring import VertexColor, add_4_coloring_grover, get_color_from_binary_string
 
 
 class Graph:
