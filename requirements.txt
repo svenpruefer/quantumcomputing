@@ -1,6 +1,6 @@
 # General python tooling
 pip==20.2.3
-setuptools==50.3.0
+setuptools==65.5.1
 pytest==6.1.1
 
 # Qiskit
